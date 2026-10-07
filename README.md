@@ -100,7 +100,7 @@ A later **static web demo using the MoonBit JavaScript backend** may reuse the s
 
 本项目拟用 MoonBit 实现本地大模型内存预算计算器。Basic 仅需参数量、权重量化、显存、内存和上下文五项，通过显示来源的结构代理与敏感性情景完成估算；Advanced 可指定层数、KV 头数、头维度及 KV 精度。首期同时评估 GPU 驻留、GPU+CPU offload、CPU only 和资源不足，分开报告 GPU/RAM 预算、稳态与加载峰值。计划以 27B、16 GiB VRAM、64 GiB RAM 为核心案例，交付独立 MoonBit core、Native CLI、JSON、测试及公开方法；Web 为后期可选。目前仅完成立项与调研，尚未安装工具链、实现 CLI 或运行测试。
 
-See the [Chinese project proposal](docs/project-proposal.md) for the application summary.
+See the [Chinese planning reference](docs/project-proposal.md) for an AI-assisted summary of the proposed scope. It is not the official application document. The registration form requires an applicant-written Markdown proposal of at most one page and at least 10 meaningful repository commits; registration has not been submitted.
 
 ## License
 
