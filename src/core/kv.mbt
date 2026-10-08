@@ -77,6 +77,9 @@ pub fn validate_architecture(
     architecture.query_heads > 512 {
     return Err("query-heads must be at least kv-heads and no more than 512")
   }
+  if architecture.query_heads % architecture.kv_heads != 0 {
+    return Err("MHA/GQA requires query-heads to be divisible by kv-heads")
+  }
   Ok(architecture)
 }
 

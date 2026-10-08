@@ -87,7 +87,9 @@ pub fn build_ledger(
       "weight bytes must be finite and positive within supported bounds",
     )
   }
-  if !(kv_bytes >= 0.0 && kv_bytes <= gib_to_bytes(1000000.0)) {
+  // Covers the full validated shape domain, including a hypothetical MHA
+  // sensitivity at the maximum token/layer/head/dimension bounds (1 PiB).
+  if !(kv_bytes >= 0.0 && kv_bytes <= gib_to_bytes(1048576.0)) {
     return Err(
       "KV bytes must be finite and nonnegative within supported bounds",
     )

@@ -126,3 +126,31 @@ test "invalid input and policy propagate to report errors" {
     @core.calculate(report_input(), None, @core.FP16KV, bad_policy) is Err(_),
   )
 }
+
+///|
+test "large MHA sensitivity cannot cancel a valid baseline report" {
+  let shape : @core.Architecture = {
+    layers: 512,
+    kv_heads: 1,
+    query_heads: 512,
+    head_dim: 1024,
+    source: "synthetic maximum-domain fixture; not a supported model",
+  }
+  let input = {
+    ..report_input(),
+    params_b: 7.0,
+    context: 1048576,
+    vram_gib: 4096.0,
+    ram_gib: 4096.0,
+  }
+  let report = @core.calculate(
+    input,
+    Some(shape),
+    @core.FP16KV,
+    @core.default_policy(),
+  ).unwrap()
+  assert_eq(report.kv_bytes, @core.gib_to_bytes(2048.0))
+  assert_eq(report.fit.status, @core.FullGPU)
+  assert_eq(report.sensitivity[2].kv_bytes, @core.gib_to_bytes(1048576.0))
+  assert_eq(report.sensitivity[2].fit.status, @core.Insufficient)
+}

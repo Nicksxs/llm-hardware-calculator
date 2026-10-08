@@ -105,3 +105,19 @@ test "KV recipe parser distinguishes weight recipe names" {
   assert_true(@core.parse_kv_precision("Q4_K_M") is Err(_))
   assert_eq(@core.kv_precision_name(@core.Q4KV), "Q4_0")
 }
+
+///|
+test "GQA query heads must form complete KV groups" {
+  let shape : @core.Architecture = {
+    layers: 4,
+    kv_heads: 3,
+    query_heads: 5,
+    head_dim: 128,
+    source: "invalid GQA test fixture",
+  }
+  assert_true(@core.validate_architecture(shape) is Err(_))
+  assert_true(@core.estimate_kv(4096, shape, @core.FP16KV) is Err(_))
+  assert_true(
+    @core.validate_architecture({ ..shape, query_heads: 6, }) is Ok(_),
+  )
+}

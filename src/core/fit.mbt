@@ -1,3 +1,4 @@
+///|
 /// Classification under the selected capacity-planning policies.
 pub(all) enum FitStatus {
   FullGPU
@@ -6,18 +7,26 @@ pub(all) enum FitStatus {
   Insufficient
 } derive(Eq, Debug)
 
+///|
 pub extend FitStatus with Eq::{equal, not_equal}
+
+///|
 pub extend FitStatus with @debug.Debug::{to_repr}
 
+///|
 pub(all) struct FitResult {
   status : FitStatus
   ledger : MemoryLedger?
   reason : String
 } derive(Eq, Debug)
 
+///|
 pub extend FitResult with Eq::{equal, not_equal}
+
+///|
 pub extend FitResult with @debug.Debug::{to_repr}
 
+///|
 pub fn fit_status_name(status : FitStatus) -> String {
   match status {
     FullGPU => "FULL_GPU"
@@ -27,6 +36,7 @@ pub fn fit_status_name(status : FitStatus) -> String {
   }
 }
 
+///|
 /// Search integer layer placements from most GPU-resident to CPU-only. Both
 /// steady-state and loading peaks must fit each device independently. This is
 /// a uniform-layer capacity estimate, not an exact backend placement plan.
@@ -51,9 +61,11 @@ pub fn search_fit(
   }
   let vram_bytes = gib_to_bytes(vram_gib)
   let ram_bytes = gib_to_bytes(ram_gib)
-  let assumptions = "uniform-layer allocation and full-host-weights-loading-policy; " + policy.id
+  let assumptions = "uniform-layer allocation and full-host-weights-loading-policy; " +
+    policy.id
   for gpu_layers = layers; gpu_layers >= 0; gpu_layers = gpu_layers - 1 {
-    let ledger = match build_ledger(weights_bytes, kv_bytes, layers, gpu_layers, policy) {
+    let ledger = match
+      build_ledger(weights_bytes, kv_bytes, layers, gpu_layers, policy) {
       Err(message) => return Err(message)
       Ok(value) => value
     }
@@ -71,8 +83,10 @@ pub fn search_fit(
       return Ok({
         status,
         ledger: Some(ledger),
-        reason: "Estimated " + fit_status_name(status) +
-          " fits separate GPU/RAM steady-state and loading budgets under " + assumptions,
+        reason: "Estimated " +
+        fit_status_name(status) +
+        " fits separate GPU/RAM steady-state and loading budgets under " +
+        assumptions,
       })
     }
   }
@@ -80,6 +94,7 @@ pub fn search_fit(
     status: Insufficient,
     ledger: None,
     reason: "No integer-layer placement fits separate GPU/RAM steady-state and loading budgets under " +
-      assumptions + ". This policy result does not establish that every backend configuration is unable to run.",
+    assumptions +
+    ". This policy result does not establish that every backend configuration is unable to run.",
   })
 }
