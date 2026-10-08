@@ -1,0 +1,6 @@
+import {
+  "Nicksxs/llm-hardware-calculator/core",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/string",
+  "moonbitlang/core/json",
+}
