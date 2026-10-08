@@ -1,0 +1,69 @@
+name: Native CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+
+      - name: Install pinned MoonBit toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          LLMCALC_MOON_HOME="$RUNNER_TEMP/llmcalc-moonbit"
+          LLMCALC_DOWNLOADS="$RUNNER_TEMP/llmcalc-downloads"
+          mkdir -p "$LLMCALC_MOON_HOME/lib" "$LLMCALC_DOWNLOADS"
+
+          curl --fail --location --retry 3 --connect-timeout 20 --max-time 180 \
+            'https://cli.moonbitlang.com/binaries/0.10.14%2B7d59c7ec9/moonbit-linux-x86_64.tar.gz' \
+            --output "$LLMCALC_DOWNLOADS/moonbit-linux-x86_64.tar.gz"
+          printf '9226694de9ff978db1ecf820b7710c4224e84ec7a76b19a222d96f0cd4e31b6a  %s\n' \
+            "$LLMCALC_DOWNLOADS/moonbit-linux-x86_64.tar.gz" | sha256sum --check --strict
+
+          curl --fail --location --retry 3 --connect-timeout 20 --max-time 180 \
+            'https://cli.moonbitlang.com/cores/core-0.10.14%2B7d59c7ec9.tar.gz' \
+            --output "$LLMCALC_DOWNLOADS/core.tar.gz"
+          printf '6f18b8fdea18f85e628a75e4a1bd3977c5a5c9c6a836fd8824192b0e6bd91b14  %s\n' \
+            "$LLMCALC_DOWNLOADS/core.tar.gz" | sha256sum --check --strict
+
+          tar -xzf "$LLMCALC_DOWNLOADS/moonbit-linux-x86_64.tar.gz" -C "$LLMCALC_MOON_HOME"
+          tar -xzf "$LLMCALC_DOWNLOADS/core.tar.gz" -C "$LLMCALC_MOON_HOME/lib"
+          chmod +x "$LLMCALC_MOON_HOME"/bin/* "$LLMCALC_MOON_HOME/bin/internal/tcc"
+          export MOON_HOME="$LLMCALC_MOON_HOME"
+          export PATH="$MOON_HOME/bin:$PATH"
+          printf 'MOON_HOME=%s\n' "$MOON_HOME" >> "$GITHUB_ENV"
+          printf '%s\n' "$MOON_HOME/bin" >> "$GITHUB_PATH"
+
+          LLMCALC_VERSIONS="$(moon version --all)"
+          printf '%s\n' "$LLMCALC_VERSIONS"
+          [[ "$LLMCALC_VERSIONS" == *'moon 0.1.20260920 (914d7da 2026-09-20)'* ]]
+          [[ "$LLMCALC_VERSIONS" == *'moonc v0.10.14+7d59c7ec9 (2026-09-18)'* ]]
+          moon -C "$MOON_HOME/lib/core" bundle --target native --warn-list -a
+
+      - name: Check
+        run: moon check --target native --deny-warn
+
+      - name: Test
+        run: moon test --target native --deny-warn
+
+      - name: Check formatting
+        run: moon fmt --check
+
+      - name: Build native release
+        run: moon build --target native --release --deny-warn
+
+      - name: Verify CLI integration
+        run: python3 scripts/verify_cli.py _build/native/release/build/cmd/llmcalc/llmcalc.exe

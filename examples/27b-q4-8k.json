@@ -1,0 +1,177 @@
+{
+  "schema_version": "1",
+  "input": {
+    "params_b": 27,
+    "quant": "Q4_K_M",
+    "vram_gib": 16,
+    "ram_gib": 64,
+    "context_tokens": 8192
+  },
+  "architecture_mode": "Basic upper-size-bucket proxy (not model detection)",
+  "architecture": {
+    "layers": 64,
+    "kv_heads": 8,
+    "head_dim": 128,
+    "query_heads": 40,
+    "source": "Qwen2.5-32B-Instruct proxy: https://huggingface.co/Qwen/Qwen2.5-32B-Instruct/raw/5ede1c97bbab6ce5cda5812749b4c0bdf79b18dd/config.json"
+  },
+  "weights": {
+    "baseline_bytes": 15187500000,
+    "planning_bytes": 16368749999.999998,
+    "low_bytes": 15187500000,
+    "high_bytes": 17550000000,
+    "baseline_bpw": 4.5,
+    "effective_bpw": 4.85,
+    "policy": "planning-policy-v1 (uncalibrated; excludes metadata and runtime; range is not a confidence interval)"
+  },
+  "kv": {
+    "precision": "FP16",
+    "bytes": 2147483648,
+    "gib": 2,
+    "formula": "context * layers * kv_heads * head_dim * 2 * bytes_per_element",
+    "sequences": 1
+  },
+  "policy": {
+    "id": "capacity-policy-v1 (uncalibrated; full host weights retained during loading)",
+    "gpu_runtime_gib": 0.5,
+    "gpu_margin_gib": 1,
+    "host_runtime_gib": 1,
+    "os_reserve_gib": 4,
+    "loading_workspace_gib": 1,
+    "gpu_staging_gib": 0.25
+  },
+  "fit": {
+    "status": "GPU+CPU OFFLOAD",
+    "reason": "Estimated GPU+CPU OFFLOAD fits separate GPU/RAM steady-state and loading budgets under uniform-layer allocation and full-host-weights-loading-policy; capacity-policy-v1 (uncalibrated; full host weights retained during loading)",
+    "ledger": {
+      "gpu_layers": 52,
+      "cpu_layers": 12,
+      "gpu_weights_bytes": 13299609374.999998,
+      "gpu_kv_bytes": 1744830464,
+      "gpu_runtime_bytes": 536870912,
+      "gpu_margin_bytes": 1073741824,
+      "gpu_staging_bytes": 268435456,
+      "host_weights_bytes": 3069140625,
+      "host_kv_bytes": 402653184,
+      "host_runtime_bytes": 1073741824,
+      "os_reserve_bytes": 4294967296,
+      "loading_workspace_bytes": 1073741824,
+      "gpu_steady_bytes": 16655052574.999998,
+      "gpu_loading_peak_bytes": 16923488030.999998,
+      "host_steady_bytes": 8840502929,
+      "host_loading_peak_bytes": 23213854128
+    }
+  },
+  "sensitivity": [
+    {
+      "label": "weight-policy-low (not a confidence bound)",
+      "architecture": {
+        "layers": 64,
+        "kv_heads": 8,
+        "head_dim": 128,
+        "query_heads": 40,
+        "source": "Qwen2.5-32B-Instruct proxy: https://huggingface.co/Qwen/Qwen2.5-32B-Instruct/raw/5ede1c97bbab6ce5cda5812749b4c0bdf79b18dd/config.json"
+      },
+      "weights_bytes": 15187500000,
+      "kv_bytes": 2147483648,
+      "fit": {
+        "status": "GPU+CPU OFFLOAD",
+        "reason": "Estimated GPU+CPU OFFLOAD fits separate GPU/RAM steady-state and loading budgets under uniform-layer allocation and full-host-weights-loading-policy; capacity-policy-v1 (uncalibrated; full host weights retained during loading)",
+        "ledger": {
+          "gpu_layers": 56,
+          "cpu_layers": 8,
+          "gpu_weights_bytes": 13289062500,
+          "gpu_kv_bytes": 1879048192,
+          "gpu_runtime_bytes": 536870912,
+          "gpu_margin_bytes": 1073741824,
+          "gpu_staging_bytes": 268435456,
+          "host_weights_bytes": 1898437500,
+          "host_kv_bytes": 268435456,
+          "host_runtime_bytes": 1073741824,
+          "os_reserve_bytes": 4294967296,
+          "loading_workspace_bytes": 1073741824,
+          "gpu_steady_bytes": 16778723428,
+          "gpu_loading_peak_bytes": 17047158884,
+          "host_steady_bytes": 7535582076,
+          "host_loading_peak_bytes": 21898386400
+        }
+      }
+    },
+    {
+      "label": "weight-policy-high (not a confidence bound)",
+      "architecture": {
+        "layers": 64,
+        "kv_heads": 8,
+        "head_dim": 128,
+        "query_heads": 40,
+        "source": "Qwen2.5-32B-Instruct proxy: https://huggingface.co/Qwen/Qwen2.5-32B-Instruct/raw/5ede1c97bbab6ce5cda5812749b4c0bdf79b18dd/config.json"
+      },
+      "weights_bytes": 17550000000,
+      "kv_bytes": 2147483648,
+      "fit": {
+        "status": "GPU+CPU OFFLOAD",
+        "reason": "Estimated GPU+CPU OFFLOAD fits separate GPU/RAM steady-state and loading budgets under uniform-layer allocation and full-host-weights-loading-policy; capacity-policy-v1 (uncalibrated; full host weights retained during loading)",
+        "ledger": {
+          "gpu_layers": 49,
+          "cpu_layers": 15,
+          "gpu_weights_bytes": 13436718750,
+          "gpu_kv_bytes": 1644167168,
+          "gpu_runtime_bytes": 536870912,
+          "gpu_margin_bytes": 1073741824,
+          "gpu_staging_bytes": 268435456,
+          "host_weights_bytes": 4113281250,
+          "host_kv_bytes": 503316480,
+          "host_runtime_bytes": 1073741824,
+          "os_reserve_bytes": 4294967296,
+          "loading_workspace_bytes": 1073741824,
+          "gpu_steady_bytes": 16691498654,
+          "gpu_loading_peak_bytes": 16959934110,
+          "host_steady_bytes": 9985306850,
+          "host_loading_peak_bytes": 24495767424
+        }
+      }
+    },
+    {
+      "label": "MHA-structure (hypothetical; not architecture detection)",
+      "architecture": {
+        "layers": 64,
+        "kv_heads": 40,
+        "head_dim": 128,
+        "query_heads": 40,
+        "source": "Qwen2.5-32B-Instruct proxy: https://huggingface.co/Qwen/Qwen2.5-32B-Instruct/raw/5ede1c97bbab6ce5cda5812749b4c0bdf79b18dd/config.json | hypothetical MHA sensitivity with KV heads = query heads"
+      },
+      "weights_bytes": 16368749999.999998,
+      "kv_bytes": 10737418240,
+      "fit": {
+        "status": "GPU+CPU OFFLOAD",
+        "reason": "Estimated GPU+CPU OFFLOAD fits separate GPU/RAM steady-state and loading budgets under uniform-layer allocation and full-host-weights-loading-policy; capacity-policy-v1 (uncalibrated; full host weights retained during loading)",
+        "ledger": {
+          "gpu_layers": 36,
+          "cpu_layers": 28,
+          "gpu_weights_bytes": 9207421874.999998,
+          "gpu_kv_bytes": 6039797760,
+          "gpu_runtime_bytes": 536870912,
+          "gpu_margin_bytes": 1073741824,
+          "gpu_staging_bytes": 268435456,
+          "host_weights_bytes": 7161328125,
+          "host_kv_bytes": 4697620480,
+          "host_runtime_bytes": 1073741824,
+          "os_reserve_bytes": 4294967296,
+          "loading_workspace_bytes": 1073741824,
+          "gpu_steady_bytes": 16857832370.999998,
+          "gpu_loading_peak_bytes": 17126267826.999998,
+          "host_steady_bytes": 17227657725,
+          "host_loading_peak_bytes": 27508821424
+        }
+      }
+    }
+  ],
+  "assumptions": {
+    "scope": "one GPU, dense decoder-only full attention, MHA/GQA, one sequence",
+    "offload": "uniform layer weight and KV split; not a runtime tensor placement guarantee",
+    "loading": "full host weight copy plus CPU KV, host runtime, OS reserve and loading workspace",
+    "kv_runtime": "quantized KV is a memory scenario; runtime/weight/KV compatibility is not guaranteed",
+    "weight_range": "uncalibrated planning scenarios, not measured accuracy or confidence bounds",
+    "units": "B parameters = 1e9; GiB = 2^30 bytes; GB input = 1e9 bytes; K context = 1024"
+  }
+}
