@@ -1,0 +1,4 @@
+// Pure computation; no filesystem, network, or runtime dependencies.
+import {
+  "moonbitlang/core/debug",
+}

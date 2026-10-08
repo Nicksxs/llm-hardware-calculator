@@ -1,8 +1,8 @@
 # LLM Hardware Calculator
 
-A proposed MoonBit tool for explaining the memory budget of local LLM inference.
+A MoonBit tool in development for explaining the memory budget of local LLM inference.
 
-**Status: proposal stage, 7 October 2026.** This repository currently contains project documentation. The MoonBit toolchain has not been installed in the development environment. The calculation engine and CLI have not been implemented, and no project tests or hardware measurements have been run. There is no runnable release yet.
+**Status: development in progress, 8 October 2026.** The MoonBit v0.10.14 native toolchain is verified. Input validation and binary memory-unit helpers are implemented and tested; the calculation engine and CLI are being developed. No hardware measurements have been run, and there is no versioned release yet. See [toolchain details](docs/toolchain.md).
 
 The project is being prepared as a proposal for the October 2026 MoonBit Hackathon season. This statement does not indicate that registration or submission has been completed.
 
@@ -87,7 +87,7 @@ There is currently **no validated accuracy figure or fixed error bound**. Struct
 | Stage | Status and intended evidence |
 | --- | --- |
 | Scope and source research | Completed initial MoonBit and upstream quantization/KV documentation review; this is research only. |
-| Toolchain and setup | Planned: install and record a MoonBit version, establish packages and repeatable checks. |
+| Toolchain and setup | Completed: verified v0.10.14, native core package, validated inputs, unit helpers, and initial tests. |
 | Core and presets | Planned: Basic proxies, Advanced values, all listed precisions, and sensitivity reports. |
 | Placement scenarios | Planned: full GPU, GPU+CPU offload, CPU only, insufficient budgets, and loading versus steady-state accounting. |
 | CLI and JSON | Planned: native entry point and documented input/output after implementation. |
@@ -98,7 +98,7 @@ A later **static web demo using the MoonBit JavaScript backend** may reuse the s
 
 ## 中文简述
 
-本项目拟用 MoonBit 实现本地大模型内存预算计算器。Basic 仅需参数量、权重量化、显存、内存和上下文五项，通过显示来源的结构代理与敏感性情景完成估算；Advanced 可指定层数、KV 头数、头维度及 KV 精度。首期同时评估 GPU 驻留、GPU+CPU offload、CPU only 和资源不足，分开报告 GPU/RAM 预算、稳态与加载峰值。计划以 27B、16 GiB VRAM、64 GiB RAM 为核心案例，交付独立 MoonBit core、Native CLI、JSON、测试及公开方法；Web 为后期可选。目前仅完成立项与调研，尚未安装工具链、实现 CLI 或运行测试。
+本项目拟用 MoonBit 实现本地大模型内存预算计算器。Basic 仅需参数量、权重量化、显存、内存和上下文五项，通过显示来源的结构代理与敏感性情景完成估算；Advanced 可指定层数、KV 头数、头维度及 KV 精度。首期同时评估 GPU 驻留、GPU+CPU offload、CPU only 和资源不足，分开报告 GPU/RAM 预算、稳态与加载峰值。计划以 27B、16 GiB VRAM、64 GiB RAM 为核心案例，交付独立 MoonBit core、Native CLI、JSON、测试及公开方法；Web 为后期可选。目前已验证工具链并完成输入校验、单位换算与对应测试，计算引擎和 CLI 正在开发，尚无硬件实测。
 
 See the [Chinese planning reference](docs/project-proposal.md) for an AI-assisted summary of the proposed scope. It is not the official application document. The registration form requires an applicant-written Markdown proposal of at most one page and at least 10 meaningful repository commits; registration has not been submitted.
 
