@@ -1,0 +1,17 @@
+{
+  "source_revision": "88aaf325a7026ac1127d0897394b0a3d6413dc2a",
+  "source_archive_sha256": "20c307e54cd299aab1b5dacd4fdd5d8ccd18c2120281836b97fd761b181730ad",
+  "source_archive_size": 38222292,
+  "cmake_cache_flags": {
+    "CMAKE_BUILD_TYPE": "Release",
+    "GGML_ACCELERATE": "OFF",
+    "GGML_BLAS": "OFF",
+    "GGML_CUDA": "OFF",
+    "GGML_METAL": "OFF",
+    "GGML_OPENMP": "OFF",
+    "GGML_VULKAN": "OFF",
+    "LLAMA_BUILD_COMMIT": "88aaf325a7026ac1127d0897394b0a3d6413dc2a"
+  },
+  "target": "llama-completion",
+  "build_parallel_jobs": 2
+}

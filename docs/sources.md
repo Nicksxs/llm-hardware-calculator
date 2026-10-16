@@ -1,5 +1,16 @@
 # Primary sources
 
+## Artifact pipeline update, 16 October 2026
+
+The GGUF and tensor-planning packages use a newer fixed source snapshot than the historical manual-estimation research below:
+
+- [GGUF format, ggml a05c9922613c6a2230dbb1d0de679519ecafb4f0](https://github.com/ggml-org/ggml/blob/a05c9922613c6a2230dbb1d0de679519ecafb4f0/docs/gguf.md).
+- [GGML storage registry, llama.cpp 88aaf325](https://github.com/ggml-org/llama.cpp/blob/88aaf325a7026ac1127d0897394b0a3d6413dc2a/gguf-py/gguf/constants.py), [C++ reader](https://github.com/ggml-org/llama.cpp/blob/88aaf325a7026ac1127d0897394b0a3d6413dc2a/ggml/src/gguf.cpp), and [independent Python reader](https://github.com/ggml-org/llama.cpp/blob/88aaf325a7026ac1127d0897394b0a3d6413dc2a/gguf-py/gguf/gguf_reader.py).
+- [Output-first device selection](https://github.com/ggml-org/llama.cpp/blob/88aaf325a7026ac1127d0897394b0a3d6413dc2a/src/llama-model.cpp) and [loader duplication](https://github.com/ggml-org/llama.cpp/blob/88aaf325a7026ac1127d0897394b0a3d6413dc2a/src/llama-model-loader.cpp).
+- [Single-sequence 256-token context padding](https://github.com/ggml-org/llama.cpp/blob/88aaf325a7026ac1127d0897394b0a3d6413dc2a/src/llama-context.cpp).
+
+See [GGUF inspection](gguf.md), [artifact planning](artifact-planning.md), the [model manifest](../examples/validation/model-manifest.json) and [current validation evidence](validation.md). The older sections below remain provenance for manual BPW/proxy mode; their earlier no-hardware-measurement status is historical, superseded for the specific CPU cases documented in the current evidence.
+
 Checked on 8 October 2026. These links pin the source revision used to check the calculator's formulas and presets. The calculator implements its own MoonBit arithmetic; it does not embed upstream inference or quantization code.
 
 ## Quantization and KV tensor layout

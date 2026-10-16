@@ -28,8 +28,11 @@ moon test --target native --deny-warn
 moon fmt --check
 moon build --target native --release --deny-warn
 python3 scripts/verify_cli.py _build/native/release/build/cmd/llmcalc/llmcalc.exe
+python3 scripts/verify_gguf.py _build/native/release/build/cmd/llmcalc/llmcalc.exe
 ```
 
 Compilation and tests treat warnings as errors. Formatting is checked without changing sources. The integration script runs the release executable and checks CLI behavior and machine-readable output independently of package unit tests. Ubuntu's existing Python 3 runs the script; no Python packages are required.
 
 A green job verifies these checks on that GitHub-hosted Linux runner. It does not establish hardware memory accuracy, inference-backend compatibility, performance, JS/Wasm support or successful model loading. Changing the fixed toolchain requires updating both artifact hashes and expected versions together, then confirming a new CI run.
+
+The GGUF verifier adds real native file reads, malformed-format fixtures, precise integer JSON and a physically created sparse file larger than 4 GiB. Its temporary data is cleaned up. Optional real-model and reference-backend checks are documented in [backend validation](backend-validation.md); the recorded local CPU evidence is separate from this self-contained CI job.

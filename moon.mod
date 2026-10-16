@@ -1,6 +1,6 @@
 name = "Nicksxs/llm-hardware-calculator"
 
-version = "0.1.0"
+version = "0.2.0"
 
 source = "src"
 
@@ -14,4 +14,4 @@ keywords = [ "llm", "memory", "calculator" ]
 
 preferred_target = "native"
 
-description = "Transparent memory budgets for single-GPU dense LLM inference"
+description = "GGUF inspection and tensor-level LLM memory placement planning"

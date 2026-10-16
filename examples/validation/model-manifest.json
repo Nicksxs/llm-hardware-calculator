@@ -1,0 +1,18 @@
+{
+  "repository": "ggml-org/tiny-llamas",
+  "revision": "99dd1a73db5a37100bd4ae633f4cfce6560e1567",
+  "models": [
+    {
+      "filename": "stories260K.gguf",
+      "file_size": 1185376,
+      "sha256": "047bf46455a544931cff6fef14d7910154c56afbc23ab1c5e56a72e69912c04b",
+      "source_url": "https://huggingface.co/ggml-org/tiny-llamas/resolve/99dd1a73db5a37100bd4ae633f4cfce6560e1567/stories260K.gguf"
+    },
+    {
+      "filename": "stories15M-q4_0.gguf",
+      "file_size": 19077344,
+      "sha256": "6151b1929d7f5aa3385d9ddef3393e55587c0a55de661562322bc51dfda93a04",
+      "source_url": "https://huggingface.co/ggml-org/tiny-llamas/resolve/99dd1a73db5a37100bd4ae633f4cfce6560e1567/stories15M-q4_0.gguf"
+    }
+  ]
+}

@@ -1,0 +1,2040 @@
+{
+  "schema_version": "1",
+  "comparison": "Native inspect versus official GGUFReader",
+  "created_at_utc": "2026-10-16T13:34:40.804137+00:00",
+  "upstream": {
+    "repository": "https://github.com/ggml-org/llama.cpp",
+    "revision": "88aaf325a7026ac1127d0897394b0a3d6413dc2a",
+    "reader_source_sha256": "d0ea743200e19d7ef0a4c969edcc4a6dba8e3656a790b217e3bdc7b31170718e",
+    "source_files_sha256": {
+      "gguf_reader.py": "d0ea743200e19d7ef0a4c969edcc4a6dba8e3656a790b217e3bdc7b31170718e",
+      "constants.py": "3e6108928a33ac8d0c5c836d1854207f9137cd2b21825b7613c3705d29c5f183",
+      "quants.py": "2c927a1b3d9f0920dcf4007fb686e1b0999333e9f65ce43dcc689900c0beae8b",
+      "lazy.py": "dbc98e3ee9ef8606df34e9d91f98ab29c2697e6824995f1dd8952938c135ad85"
+    }
+  },
+  "runtime": {
+    "python_version": "3.12.14",
+    "numpy_version": "2.3.5"
+  },
+  "calculator": {
+    "binary": "llmcalc.exe",
+    "sha256": "772b1055c79aaac09e924751a194ced2ffacce345a44b2a095cd0c5fe6dceb7a"
+  },
+  "shape_convention": "GGML dimensions use ReaderTensor.shape; NumPy payload data.shape is reversed and may be quantization-byte-packed",
+  "scope": "tensor directory and selected scalar structure metadata comparison; not tensor-content validation, inference accuracy, performance, or universal GGUF compatibility",
+  "models": [
+    {
+      "model": "stories260K.gguf",
+      "input_sha256": "047bf46455a544931cff6fef14d7910154c56afbc23ab1c5e56a72e69912c04b",
+      "file_size": "1185376",
+      "gguf_version": 3,
+      "data_offset": "14176",
+      "summary": {
+        "tensor_count": 48,
+        "stored_tensor_elements": "292800",
+        "tensor_payload_bytes": "1171200",
+        "by_type": {
+          "0": {
+            "type_name": "F32",
+            "tensor_count": 48,
+            "payload_bytes": "1171200",
+            "element_count": "292800"
+          }
+        }
+      },
+      "selected_metadata": {
+        "general.architecture": {
+          "official": {
+            "kind": "string",
+            "value": "llama"
+          },
+          "calculator": {
+            "kind": "string",
+            "value": "llama"
+          },
+          "match": true
+        },
+        "general.name": {
+          "official": {
+            "kind": "string",
+            "value": "llama"
+          },
+          "calculator": {
+            "kind": "string",
+            "value": "llama"
+          },
+          "match": true
+        },
+        "llama.attention.head_count": {
+          "official": {
+            "kind": "unsigned_integer",
+            "value": "8"
+          },
+          "calculator": {
+            "kind": "unsigned_integer",
+            "value": "8"
+          },
+          "match": true
+        },
+        "llama.attention.head_count_kv": {
+          "official": {
+            "kind": "unsigned_integer",
+            "value": "4"
+          },
+          "calculator": {
+            "kind": "unsigned_integer",
+            "value": "4"
+          },
+          "match": true
+        },
+        "llama.block_count": {
+          "official": {
+            "kind": "unsigned_integer",
+            "value": "5"
+          },
+          "calculator": {
+            "kind": "unsigned_integer",
+            "value": "5"
+          },
+          "match": true
+        },
+        "llama.context_length": {
+          "official": {
+            "kind": "unsigned_integer",
+            "value": "128"
+          },
+          "calculator": {
+            "kind": "unsigned_integer",
+            "value": "128"
+          },
+          "match": true
+        },
+        "llama.embedding_length": {
+          "official": {
+            "kind": "unsigned_integer",
+            "value": "64"
+          },
+          "calculator": {
+            "kind": "unsigned_integer",
+            "value": "64"
+          },
+          "match": true
+        },
+        "llama.feed_forward_length": {
+          "official": {
+            "kind": "unsigned_integer",
+            "value": "172"
+          },
+          "calculator": {
+            "kind": "unsigned_integer",
+            "value": "172"
+          },
+          "match": true
+        },
+        "llama.rope.dimension_count": {
+          "official": {
+            "kind": "unsigned_integer",
+            "value": "8"
+          },
+          "calculator": {
+            "kind": "unsigned_integer",
+            "value": "8"
+          },
+          "match": true
+        }
+      },
+      "tensors": [
+        {
+          "name": "token_embd.weight",
+          "ggml_dimensions": [
+            "64",
+            "512"
+          ],
+          "type_id": 0,
+          "element_count": "32768",
+          "byte_size": "131072",
+          "relative_offset": "0",
+          "absolute_offset": "14176",
+          "numpy_payload_shape": [
+            512,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "output_norm.weight",
+          "ggml_dimensions": [
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "64",
+          "byte_size": "256",
+          "relative_offset": "131072",
+          "absolute_offset": "145248",
+          "numpy_payload_shape": [
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "output.weight",
+          "ggml_dimensions": [
+            "64",
+            "512"
+          ],
+          "type_id": 0,
+          "element_count": "32768",
+          "byte_size": "131072",
+          "relative_offset": "131328",
+          "absolute_offset": "145504",
+          "numpy_payload_shape": [
+            512,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.0.attn_q.weight",
+          "ggml_dimensions": [
+            "64",
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "4096",
+          "byte_size": "16384",
+          "relative_offset": "262400",
+          "absolute_offset": "276576",
+          "numpy_payload_shape": [
+            64,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.0.attn_k.weight",
+          "ggml_dimensions": [
+            "64",
+            "32"
+          ],
+          "type_id": 0,
+          "element_count": "2048",
+          "byte_size": "8192",
+          "relative_offset": "278784",
+          "absolute_offset": "292960",
+          "numpy_payload_shape": [
+            32,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.0.attn_v.weight",
+          "ggml_dimensions": [
+            "64",
+            "32"
+          ],
+          "type_id": 0,
+          "element_count": "2048",
+          "byte_size": "8192",
+          "relative_offset": "286976",
+          "absolute_offset": "301152",
+          "numpy_payload_shape": [
+            32,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.0.attn_output.weight",
+          "ggml_dimensions": [
+            "64",
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "4096",
+          "byte_size": "16384",
+          "relative_offset": "295168",
+          "absolute_offset": "309344",
+          "numpy_payload_shape": [
+            64,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.0.attn_norm.weight",
+          "ggml_dimensions": [
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "64",
+          "byte_size": "256",
+          "relative_offset": "311552",
+          "absolute_offset": "325728",
+          "numpy_payload_shape": [
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.0.ffn_gate.weight",
+          "ggml_dimensions": [
+            "64",
+            "172"
+          ],
+          "type_id": 0,
+          "element_count": "11008",
+          "byte_size": "44032",
+          "relative_offset": "311808",
+          "absolute_offset": "325984",
+          "numpy_payload_shape": [
+            172,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.0.ffn_down.weight",
+          "ggml_dimensions": [
+            "172",
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "11008",
+          "byte_size": "44032",
+          "relative_offset": "355840",
+          "absolute_offset": "370016",
+          "numpy_payload_shape": [
+            64,
+            172
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.0.ffn_up.weight",
+          "ggml_dimensions": [
+            "64",
+            "172"
+          ],
+          "type_id": 0,
+          "element_count": "11008",
+          "byte_size": "44032",
+          "relative_offset": "399872",
+          "absolute_offset": "414048",
+          "numpy_payload_shape": [
+            172,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.0.ffn_norm.weight",
+          "ggml_dimensions": [
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "64",
+          "byte_size": "256",
+          "relative_offset": "443904",
+          "absolute_offset": "458080",
+          "numpy_payload_shape": [
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.1.attn_q.weight",
+          "ggml_dimensions": [
+            "64",
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "4096",
+          "byte_size": "16384",
+          "relative_offset": "444160",
+          "absolute_offset": "458336",
+          "numpy_payload_shape": [
+            64,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.1.attn_k.weight",
+          "ggml_dimensions": [
+            "64",
+            "32"
+          ],
+          "type_id": 0,
+          "element_count": "2048",
+          "byte_size": "8192",
+          "relative_offset": "460544",
+          "absolute_offset": "474720",
+          "numpy_payload_shape": [
+            32,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.1.attn_v.weight",
+          "ggml_dimensions": [
+            "64",
+            "32"
+          ],
+          "type_id": 0,
+          "element_count": "2048",
+          "byte_size": "8192",
+          "relative_offset": "468736",
+          "absolute_offset": "482912",
+          "numpy_payload_shape": [
+            32,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.1.attn_output.weight",
+          "ggml_dimensions": [
+            "64",
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "4096",
+          "byte_size": "16384",
+          "relative_offset": "476928",
+          "absolute_offset": "491104",
+          "numpy_payload_shape": [
+            64,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.1.attn_norm.weight",
+          "ggml_dimensions": [
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "64",
+          "byte_size": "256",
+          "relative_offset": "493312",
+          "absolute_offset": "507488",
+          "numpy_payload_shape": [
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.1.ffn_gate.weight",
+          "ggml_dimensions": [
+            "64",
+            "172"
+          ],
+          "type_id": 0,
+          "element_count": "11008",
+          "byte_size": "44032",
+          "relative_offset": "493568",
+          "absolute_offset": "507744",
+          "numpy_payload_shape": [
+            172,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.1.ffn_down.weight",
+          "ggml_dimensions": [
+            "172",
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "11008",
+          "byte_size": "44032",
+          "relative_offset": "537600",
+          "absolute_offset": "551776",
+          "numpy_payload_shape": [
+            64,
+            172
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.1.ffn_up.weight",
+          "ggml_dimensions": [
+            "64",
+            "172"
+          ],
+          "type_id": 0,
+          "element_count": "11008",
+          "byte_size": "44032",
+          "relative_offset": "581632",
+          "absolute_offset": "595808",
+          "numpy_payload_shape": [
+            172,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.1.ffn_norm.weight",
+          "ggml_dimensions": [
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "64",
+          "byte_size": "256",
+          "relative_offset": "625664",
+          "absolute_offset": "639840",
+          "numpy_payload_shape": [
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.2.attn_q.weight",
+          "ggml_dimensions": [
+            "64",
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "4096",
+          "byte_size": "16384",
+          "relative_offset": "625920",
+          "absolute_offset": "640096",
+          "numpy_payload_shape": [
+            64,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.2.attn_k.weight",
+          "ggml_dimensions": [
+            "64",
+            "32"
+          ],
+          "type_id": 0,
+          "element_count": "2048",
+          "byte_size": "8192",
+          "relative_offset": "642304",
+          "absolute_offset": "656480",
+          "numpy_payload_shape": [
+            32,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.2.attn_v.weight",
+          "ggml_dimensions": [
+            "64",
+            "32"
+          ],
+          "type_id": 0,
+          "element_count": "2048",
+          "byte_size": "8192",
+          "relative_offset": "650496",
+          "absolute_offset": "664672",
+          "numpy_payload_shape": [
+            32,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.2.attn_output.weight",
+          "ggml_dimensions": [
+            "64",
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "4096",
+          "byte_size": "16384",
+          "relative_offset": "658688",
+          "absolute_offset": "672864",
+          "numpy_payload_shape": [
+            64,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.2.attn_norm.weight",
+          "ggml_dimensions": [
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "64",
+          "byte_size": "256",
+          "relative_offset": "675072",
+          "absolute_offset": "689248",
+          "numpy_payload_shape": [
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.2.ffn_gate.weight",
+          "ggml_dimensions": [
+            "64",
+            "172"
+          ],
+          "type_id": 0,
+          "element_count": "11008",
+          "byte_size": "44032",
+          "relative_offset": "675328",
+          "absolute_offset": "689504",
+          "numpy_payload_shape": [
+            172,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.2.ffn_down.weight",
+          "ggml_dimensions": [
+            "172",
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "11008",
+          "byte_size": "44032",
+          "relative_offset": "719360",
+          "absolute_offset": "733536",
+          "numpy_payload_shape": [
+            64,
+            172
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.2.ffn_up.weight",
+          "ggml_dimensions": [
+            "64",
+            "172"
+          ],
+          "type_id": 0,
+          "element_count": "11008",
+          "byte_size": "44032",
+          "relative_offset": "763392",
+          "absolute_offset": "777568",
+          "numpy_payload_shape": [
+            172,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.2.ffn_norm.weight",
+          "ggml_dimensions": [
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "64",
+          "byte_size": "256",
+          "relative_offset": "807424",
+          "absolute_offset": "821600",
+          "numpy_payload_shape": [
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.3.attn_q.weight",
+          "ggml_dimensions": [
+            "64",
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "4096",
+          "byte_size": "16384",
+          "relative_offset": "807680",
+          "absolute_offset": "821856",
+          "numpy_payload_shape": [
+            64,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.3.attn_k.weight",
+          "ggml_dimensions": [
+            "64",
+            "32"
+          ],
+          "type_id": 0,
+          "element_count": "2048",
+          "byte_size": "8192",
+          "relative_offset": "824064",
+          "absolute_offset": "838240",
+          "numpy_payload_shape": [
+            32,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.3.attn_v.weight",
+          "ggml_dimensions": [
+            "64",
+            "32"
+          ],
+          "type_id": 0,
+          "element_count": "2048",
+          "byte_size": "8192",
+          "relative_offset": "832256",
+          "absolute_offset": "846432",
+          "numpy_payload_shape": [
+            32,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.3.attn_output.weight",
+          "ggml_dimensions": [
+            "64",
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "4096",
+          "byte_size": "16384",
+          "relative_offset": "840448",
+          "absolute_offset": "854624",
+          "numpy_payload_shape": [
+            64,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.3.attn_norm.weight",
+          "ggml_dimensions": [
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "64",
+          "byte_size": "256",
+          "relative_offset": "856832",
+          "absolute_offset": "871008",
+          "numpy_payload_shape": [
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.3.ffn_gate.weight",
+          "ggml_dimensions": [
+            "64",
+            "172"
+          ],
+          "type_id": 0,
+          "element_count": "11008",
+          "byte_size": "44032",
+          "relative_offset": "857088",
+          "absolute_offset": "871264",
+          "numpy_payload_shape": [
+            172,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.3.ffn_down.weight",
+          "ggml_dimensions": [
+            "172",
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "11008",
+          "byte_size": "44032",
+          "relative_offset": "901120",
+          "absolute_offset": "915296",
+          "numpy_payload_shape": [
+            64,
+            172
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.3.ffn_up.weight",
+          "ggml_dimensions": [
+            "64",
+            "172"
+          ],
+          "type_id": 0,
+          "element_count": "11008",
+          "byte_size": "44032",
+          "relative_offset": "945152",
+          "absolute_offset": "959328",
+          "numpy_payload_shape": [
+            172,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.3.ffn_norm.weight",
+          "ggml_dimensions": [
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "64",
+          "byte_size": "256",
+          "relative_offset": "989184",
+          "absolute_offset": "1003360",
+          "numpy_payload_shape": [
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.4.attn_q.weight",
+          "ggml_dimensions": [
+            "64",
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "4096",
+          "byte_size": "16384",
+          "relative_offset": "989440",
+          "absolute_offset": "1003616",
+          "numpy_payload_shape": [
+            64,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.4.attn_k.weight",
+          "ggml_dimensions": [
+            "64",
+            "32"
+          ],
+          "type_id": 0,
+          "element_count": "2048",
+          "byte_size": "8192",
+          "relative_offset": "1005824",
+          "absolute_offset": "1020000",
+          "numpy_payload_shape": [
+            32,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.4.attn_v.weight",
+          "ggml_dimensions": [
+            "64",
+            "32"
+          ],
+          "type_id": 0,
+          "element_count": "2048",
+          "byte_size": "8192",
+          "relative_offset": "1014016",
+          "absolute_offset": "1028192",
+          "numpy_payload_shape": [
+            32,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.4.attn_output.weight",
+          "ggml_dimensions": [
+            "64",
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "4096",
+          "byte_size": "16384",
+          "relative_offset": "1022208",
+          "absolute_offset": "1036384",
+          "numpy_payload_shape": [
+            64,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.4.attn_norm.weight",
+          "ggml_dimensions": [
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "64",
+          "byte_size": "256",
+          "relative_offset": "1038592",
+          "absolute_offset": "1052768",
+          "numpy_payload_shape": [
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.4.ffn_gate.weight",
+          "ggml_dimensions": [
+            "64",
+            "172"
+          ],
+          "type_id": 0,
+          "element_count": "11008",
+          "byte_size": "44032",
+          "relative_offset": "1038848",
+          "absolute_offset": "1053024",
+          "numpy_payload_shape": [
+            172,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.4.ffn_down.weight",
+          "ggml_dimensions": [
+            "172",
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "11008",
+          "byte_size": "44032",
+          "relative_offset": "1082880",
+          "absolute_offset": "1097056",
+          "numpy_payload_shape": [
+            64,
+            172
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.4.ffn_up.weight",
+          "ggml_dimensions": [
+            "64",
+            "172"
+          ],
+          "type_id": 0,
+          "element_count": "11008",
+          "byte_size": "44032",
+          "relative_offset": "1126912",
+          "absolute_offset": "1141088",
+          "numpy_payload_shape": [
+            172,
+            64
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.4.ffn_norm.weight",
+          "ggml_dimensions": [
+            "64"
+          ],
+          "type_id": 0,
+          "element_count": "64",
+          "byte_size": "256",
+          "relative_offset": "1170944",
+          "absolute_offset": "1185120",
+          "numpy_payload_shape": [
+            64
+          ],
+          "match": true
+        }
+      ],
+      "calculator_io": {
+        "read_calls": 923,
+        "bytes_read": "7751",
+        "max_read_end": "14152",
+        "max_request": 38
+      },
+      "match": true,
+      "differences": []
+    },
+    {
+      "model": "stories15M-q4_0.gguf",
+      "input_sha256": "6151b1929d7f5aa3385d9ddef3393e55587c0a55de661562322bc51dfda93a04",
+      "file_size": "19077344",
+      "gguf_version": 3,
+      "data_offset": "727136",
+      "summary": {
+        "tensor_count": 57,
+        "stored_tensor_elements": "24407712",
+        "tensor_payload_bytes": "18350208",
+        "by_type": {
+          "2": {
+            "type_name": "Q4_0",
+            "tensor_count": 43,
+            "payload_bytes": "8543232",
+            "element_count": "15187968"
+          },
+          "0": {
+            "type_name": "F32",
+            "tensor_count": 13,
+            "payload_bytes": "14976",
+            "element_count": "3744"
+          },
+          "8": {
+            "type_name": "Q8_0",
+            "tensor_count": 1,
+            "payload_bytes": "9792000",
+            "element_count": "9216000"
+          }
+        }
+      },
+      "selected_metadata": {
+        "general.architecture": {
+          "official": {
+            "kind": "string",
+            "value": "llama"
+          },
+          "calculator": {
+            "kind": "string",
+            "value": "llama"
+          },
+          "match": true
+        },
+        "general.file_type": {
+          "official": {
+            "kind": "unsigned_integer",
+            "value": "2"
+          },
+          "calculator": {
+            "kind": "unsigned_integer",
+            "value": "2"
+          },
+          "match": true
+        },
+        "general.name": {
+          "official": {
+            "kind": "string",
+            "value": "llama"
+          },
+          "calculator": {
+            "kind": "string",
+            "value": "llama"
+          },
+          "match": true
+        },
+        "llama.attention.head_count": {
+          "official": {
+            "kind": "unsigned_integer",
+            "value": "6"
+          },
+          "calculator": {
+            "kind": "unsigned_integer",
+            "value": "6"
+          },
+          "match": true
+        },
+        "llama.block_count": {
+          "official": {
+            "kind": "unsigned_integer",
+            "value": "6"
+          },
+          "calculator": {
+            "kind": "unsigned_integer",
+            "value": "6"
+          },
+          "match": true
+        },
+        "llama.context_length": {
+          "official": {
+            "kind": "unsigned_integer",
+            "value": "128"
+          },
+          "calculator": {
+            "kind": "unsigned_integer",
+            "value": "128"
+          },
+          "match": true
+        },
+        "llama.embedding_length": {
+          "official": {
+            "kind": "unsigned_integer",
+            "value": "288"
+          },
+          "calculator": {
+            "kind": "unsigned_integer",
+            "value": "288"
+          },
+          "match": true
+        },
+        "llama.feed_forward_length": {
+          "official": {
+            "kind": "unsigned_integer",
+            "value": "768"
+          },
+          "calculator": {
+            "kind": "unsigned_integer",
+            "value": "768"
+          },
+          "match": true
+        },
+        "llama.rope.dimension_count": {
+          "official": {
+            "kind": "unsigned_integer",
+            "value": "48"
+          },
+          "calculator": {
+            "kind": "unsigned_integer",
+            "value": "48"
+          },
+          "match": true
+        }
+      },
+      "tensors": [
+        {
+          "name": "token_embd.weight",
+          "ggml_dimensions": [
+            "288",
+            "32000"
+          ],
+          "type_id": 2,
+          "element_count": "9216000",
+          "byte_size": "5184000",
+          "relative_offset": "0",
+          "absolute_offset": "727136",
+          "numpy_payload_shape": [
+            32000,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "output_norm.weight",
+          "ggml_dimensions": [
+            "288"
+          ],
+          "type_id": 0,
+          "element_count": "288",
+          "byte_size": "1152",
+          "relative_offset": "5184000",
+          "absolute_offset": "5911136",
+          "numpy_payload_shape": [
+            288
+          ],
+          "match": true
+        },
+        {
+          "name": "output.weight",
+          "ggml_dimensions": [
+            "288",
+            "32000"
+          ],
+          "type_id": 8,
+          "element_count": "9216000",
+          "byte_size": "9792000",
+          "relative_offset": "5185152",
+          "absolute_offset": "5912288",
+          "numpy_payload_shape": [
+            32000,
+            306
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.0.attn_q.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "14977152",
+          "absolute_offset": "15704288",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.0.attn_k.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "15023808",
+          "absolute_offset": "15750944",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.0.attn_v.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "15070464",
+          "absolute_offset": "15797600",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.0.attn_output.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "15117120",
+          "absolute_offset": "15844256",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.0.attn_norm.weight",
+          "ggml_dimensions": [
+            "288"
+          ],
+          "type_id": 0,
+          "element_count": "288",
+          "byte_size": "1152",
+          "relative_offset": "15163776",
+          "absolute_offset": "15890912",
+          "numpy_payload_shape": [
+            288
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.0.ffn_gate.weight",
+          "ggml_dimensions": [
+            "288",
+            "768"
+          ],
+          "type_id": 2,
+          "element_count": "221184",
+          "byte_size": "124416",
+          "relative_offset": "15164928",
+          "absolute_offset": "15892064",
+          "numpy_payload_shape": [
+            768,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.0.ffn_down.weight",
+          "ggml_dimensions": [
+            "768",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "221184",
+          "byte_size": "124416",
+          "relative_offset": "15289344",
+          "absolute_offset": "16016480",
+          "numpy_payload_shape": [
+            288,
+            432
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.0.ffn_up.weight",
+          "ggml_dimensions": [
+            "288",
+            "768"
+          ],
+          "type_id": 2,
+          "element_count": "221184",
+          "byte_size": "124416",
+          "relative_offset": "15413760",
+          "absolute_offset": "16140896",
+          "numpy_payload_shape": [
+            768,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.0.ffn_norm.weight",
+          "ggml_dimensions": [
+            "288"
+          ],
+          "type_id": 0,
+          "element_count": "288",
+          "byte_size": "1152",
+          "relative_offset": "15538176",
+          "absolute_offset": "16265312",
+          "numpy_payload_shape": [
+            288
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.1.attn_q.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "15539328",
+          "absolute_offset": "16266464",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.1.attn_k.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "15585984",
+          "absolute_offset": "16313120",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.1.attn_v.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "15632640",
+          "absolute_offset": "16359776",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.1.attn_output.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "15679296",
+          "absolute_offset": "16406432",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.1.attn_norm.weight",
+          "ggml_dimensions": [
+            "288"
+          ],
+          "type_id": 0,
+          "element_count": "288",
+          "byte_size": "1152",
+          "relative_offset": "15725952",
+          "absolute_offset": "16453088",
+          "numpy_payload_shape": [
+            288
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.1.ffn_gate.weight",
+          "ggml_dimensions": [
+            "288",
+            "768"
+          ],
+          "type_id": 2,
+          "element_count": "221184",
+          "byte_size": "124416",
+          "relative_offset": "15727104",
+          "absolute_offset": "16454240",
+          "numpy_payload_shape": [
+            768,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.1.ffn_down.weight",
+          "ggml_dimensions": [
+            "768",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "221184",
+          "byte_size": "124416",
+          "relative_offset": "15851520",
+          "absolute_offset": "16578656",
+          "numpy_payload_shape": [
+            288,
+            432
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.1.ffn_up.weight",
+          "ggml_dimensions": [
+            "288",
+            "768"
+          ],
+          "type_id": 2,
+          "element_count": "221184",
+          "byte_size": "124416",
+          "relative_offset": "15975936",
+          "absolute_offset": "16703072",
+          "numpy_payload_shape": [
+            768,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.1.ffn_norm.weight",
+          "ggml_dimensions": [
+            "288"
+          ],
+          "type_id": 0,
+          "element_count": "288",
+          "byte_size": "1152",
+          "relative_offset": "16100352",
+          "absolute_offset": "16827488",
+          "numpy_payload_shape": [
+            288
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.2.attn_q.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "16101504",
+          "absolute_offset": "16828640",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.2.attn_k.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "16148160",
+          "absolute_offset": "16875296",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.2.attn_v.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "16194816",
+          "absolute_offset": "16921952",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.2.attn_output.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "16241472",
+          "absolute_offset": "16968608",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.2.attn_norm.weight",
+          "ggml_dimensions": [
+            "288"
+          ],
+          "type_id": 0,
+          "element_count": "288",
+          "byte_size": "1152",
+          "relative_offset": "16288128",
+          "absolute_offset": "17015264",
+          "numpy_payload_shape": [
+            288
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.2.ffn_gate.weight",
+          "ggml_dimensions": [
+            "288",
+            "768"
+          ],
+          "type_id": 2,
+          "element_count": "221184",
+          "byte_size": "124416",
+          "relative_offset": "16289280",
+          "absolute_offset": "17016416",
+          "numpy_payload_shape": [
+            768,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.2.ffn_down.weight",
+          "ggml_dimensions": [
+            "768",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "221184",
+          "byte_size": "124416",
+          "relative_offset": "16413696",
+          "absolute_offset": "17140832",
+          "numpy_payload_shape": [
+            288,
+            432
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.2.ffn_up.weight",
+          "ggml_dimensions": [
+            "288",
+            "768"
+          ],
+          "type_id": 2,
+          "element_count": "221184",
+          "byte_size": "124416",
+          "relative_offset": "16538112",
+          "absolute_offset": "17265248",
+          "numpy_payload_shape": [
+            768,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.2.ffn_norm.weight",
+          "ggml_dimensions": [
+            "288"
+          ],
+          "type_id": 0,
+          "element_count": "288",
+          "byte_size": "1152",
+          "relative_offset": "16662528",
+          "absolute_offset": "17389664",
+          "numpy_payload_shape": [
+            288
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.3.attn_q.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "16663680",
+          "absolute_offset": "17390816",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.3.attn_k.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "16710336",
+          "absolute_offset": "17437472",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.3.attn_v.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "16756992",
+          "absolute_offset": "17484128",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.3.attn_output.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "16803648",
+          "absolute_offset": "17530784",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.3.attn_norm.weight",
+          "ggml_dimensions": [
+            "288"
+          ],
+          "type_id": 0,
+          "element_count": "288",
+          "byte_size": "1152",
+          "relative_offset": "16850304",
+          "absolute_offset": "17577440",
+          "numpy_payload_shape": [
+            288
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.3.ffn_gate.weight",
+          "ggml_dimensions": [
+            "288",
+            "768"
+          ],
+          "type_id": 2,
+          "element_count": "221184",
+          "byte_size": "124416",
+          "relative_offset": "16851456",
+          "absolute_offset": "17578592",
+          "numpy_payload_shape": [
+            768,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.3.ffn_down.weight",
+          "ggml_dimensions": [
+            "768",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "221184",
+          "byte_size": "124416",
+          "relative_offset": "16975872",
+          "absolute_offset": "17703008",
+          "numpy_payload_shape": [
+            288,
+            432
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.3.ffn_up.weight",
+          "ggml_dimensions": [
+            "288",
+            "768"
+          ],
+          "type_id": 2,
+          "element_count": "221184",
+          "byte_size": "124416",
+          "relative_offset": "17100288",
+          "absolute_offset": "17827424",
+          "numpy_payload_shape": [
+            768,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.3.ffn_norm.weight",
+          "ggml_dimensions": [
+            "288"
+          ],
+          "type_id": 0,
+          "element_count": "288",
+          "byte_size": "1152",
+          "relative_offset": "17224704",
+          "absolute_offset": "17951840",
+          "numpy_payload_shape": [
+            288
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.4.attn_q.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "17225856",
+          "absolute_offset": "17952992",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.4.attn_k.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "17272512",
+          "absolute_offset": "17999648",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.4.attn_v.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "17319168",
+          "absolute_offset": "18046304",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.4.attn_output.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "17365824",
+          "absolute_offset": "18092960",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.4.attn_norm.weight",
+          "ggml_dimensions": [
+            "288"
+          ],
+          "type_id": 0,
+          "element_count": "288",
+          "byte_size": "1152",
+          "relative_offset": "17412480",
+          "absolute_offset": "18139616",
+          "numpy_payload_shape": [
+            288
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.4.ffn_gate.weight",
+          "ggml_dimensions": [
+            "288",
+            "768"
+          ],
+          "type_id": 2,
+          "element_count": "221184",
+          "byte_size": "124416",
+          "relative_offset": "17413632",
+          "absolute_offset": "18140768",
+          "numpy_payload_shape": [
+            768,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.4.ffn_down.weight",
+          "ggml_dimensions": [
+            "768",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "221184",
+          "byte_size": "124416",
+          "relative_offset": "17538048",
+          "absolute_offset": "18265184",
+          "numpy_payload_shape": [
+            288,
+            432
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.4.ffn_up.weight",
+          "ggml_dimensions": [
+            "288",
+            "768"
+          ],
+          "type_id": 2,
+          "element_count": "221184",
+          "byte_size": "124416",
+          "relative_offset": "17662464",
+          "absolute_offset": "18389600",
+          "numpy_payload_shape": [
+            768,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.4.ffn_norm.weight",
+          "ggml_dimensions": [
+            "288"
+          ],
+          "type_id": 0,
+          "element_count": "288",
+          "byte_size": "1152",
+          "relative_offset": "17786880",
+          "absolute_offset": "18514016",
+          "numpy_payload_shape": [
+            288
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.5.attn_q.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "17788032",
+          "absolute_offset": "18515168",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.5.attn_k.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "17834688",
+          "absolute_offset": "18561824",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.5.attn_v.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "17881344",
+          "absolute_offset": "18608480",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.5.attn_output.weight",
+          "ggml_dimensions": [
+            "288",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "82944",
+          "byte_size": "46656",
+          "relative_offset": "17928000",
+          "absolute_offset": "18655136",
+          "numpy_payload_shape": [
+            288,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.5.attn_norm.weight",
+          "ggml_dimensions": [
+            "288"
+          ],
+          "type_id": 0,
+          "element_count": "288",
+          "byte_size": "1152",
+          "relative_offset": "17974656",
+          "absolute_offset": "18701792",
+          "numpy_payload_shape": [
+            288
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.5.ffn_gate.weight",
+          "ggml_dimensions": [
+            "288",
+            "768"
+          ],
+          "type_id": 2,
+          "element_count": "221184",
+          "byte_size": "124416",
+          "relative_offset": "17975808",
+          "absolute_offset": "18702944",
+          "numpy_payload_shape": [
+            768,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.5.ffn_down.weight",
+          "ggml_dimensions": [
+            "768",
+            "288"
+          ],
+          "type_id": 2,
+          "element_count": "221184",
+          "byte_size": "124416",
+          "relative_offset": "18100224",
+          "absolute_offset": "18827360",
+          "numpy_payload_shape": [
+            288,
+            432
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.5.ffn_up.weight",
+          "ggml_dimensions": [
+            "288",
+            "768"
+          ],
+          "type_id": 2,
+          "element_count": "221184",
+          "byte_size": "124416",
+          "relative_offset": "18224640",
+          "absolute_offset": "18951776",
+          "numpy_payload_shape": [
+            768,
+            162
+          ],
+          "match": true
+        },
+        {
+          "name": "blk.5.ffn_norm.weight",
+          "ggml_dimensions": [
+            "288"
+          ],
+          "type_id": 0,
+          "element_count": "288",
+          "byte_size": "1152",
+          "relative_offset": "18349056",
+          "absolute_offset": "19076192",
+          "numpy_payload_shape": [
+            288
+          ],
+          "match": true
+        }
+      ],
+      "calculator_io": {
+        "read_calls": 32476,
+        "bytes_read": "260216",
+        "max_read_end": "727135",
+        "max_request": 38
+      },
+      "match": true,
+      "differences": []
+    }
+  ],
+  "all_match": true
+}

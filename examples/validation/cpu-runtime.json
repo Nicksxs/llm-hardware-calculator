@@ -1,0 +1,485 @@
+{
+  "schema_version": "1",
+  "backend_revision": "88aaf325a7026ac1127d0897394b0a3d6413dc2a",
+  "backend_version": "version: 0.7.0-dev (build 0, commit 88aaf325a7026ac1127d0897394b0a3d6413dc2a)\nbuilt with AppleClang 15.0.0.15000309 for Darwin arm64",
+  "backend_binary_sha256": "c23cd8019f61ea1873af52712e1b4ba0984731dcd87430cff74167fa201bd30f",
+  "calculator_binary_sha256": "ea3a5a673e3670d4501aa014113d3ec452a05481acf8b6f5b5429d2473534256",
+  "platform": {
+    "system": "Darwin",
+    "release": "23.6.0",
+    "machine": "arm64"
+  },
+  "mode": "CPU only; GPU and offload hardware behavior were not measured",
+  "measurement_boundary": "exact file tensor payload and raw/padded KV predictions versus rounded backend logs; process RSS includes code, allocator and other buffers, and is not compared with policy OS reserves",
+  "all_passed": true,
+  "runs": [
+    {
+      "model": "stories260K.gguf",
+      "model_sha256": "047bf46455a544931cff6fef14d7910154c56afbc23ab1c5e56a72e69912c04b",
+      "file_size": 1185376,
+      "context_requested": 128,
+      "context_allocated": 256,
+      "raw_kv_payload_bytes": 81920,
+      "allocated_kv_payload_bytes": 163840,
+      "tensor_payload_bytes": 1171200,
+      "backend_buffers": [
+        {
+          "device": "CPU",
+          "kind": "model",
+          "reported_value": 1.12,
+          "reported_unit": "MiB",
+          "rounded_bytes": 1174405.12,
+          "rounding_half_interval_bytes": 5242.88
+        },
+        {
+          "device": "CPU",
+          "kind": "output",
+          "reported_value": 0.0,
+          "reported_unit": "MiB",
+          "rounded_bytes": 0.0,
+          "rounding_half_interval_bytes": 5242.88
+        },
+        {
+          "device": "CPU",
+          "kind": "KV",
+          "reported_value": 0.16,
+          "reported_unit": "MiB",
+          "rounded_bytes": 167772.16,
+          "rounding_half_interval_bytes": 5242.88
+        },
+        {
+          "device": "CPU",
+          "kind": "compute",
+          "reported_value": 0.67,
+          "reported_unit": "MiB",
+          "rounded_bytes": 702545.92,
+          "rounding_half_interval_bytes": 5242.88
+        }
+      ],
+      "component_comparisons": [
+        {
+          "component": "model",
+          "prediction_bytes": 1171200,
+          "difference_from_rounded_backend_bytes": 3205.1200000001118,
+          "within_reported_rounding_interval": true
+        },
+        {
+          "component": "KV",
+          "prediction_bytes": 163840,
+          "difference_from_rounded_backend_bytes": 3932.1600000000035,
+          "within_reported_rounding_interval": true
+        }
+      ],
+      "observed_process": {
+        "exit_code": 0,
+        "elapsed_seconds": 0.032643,
+        "os_peak_rss_bytes": 12025856,
+        "rss_sample_count": 0,
+        "sampled_peak_rss_bytes": null,
+        "last_sampled_rss_bytes": null,
+        "rss_sampling_error": "ps sampling unavailable (OS error 1); wait4 peak remains available",
+        "rss_note": "wait4 OS process high-water RSS; samples are not a separately identified steady-state phase"
+      },
+      "log": "stories260K-ctx128.log",
+      "command_template": [
+        "llama-completion",
+        "-m",
+        "stories260K.gguf",
+        "-c",
+        "128",
+        "-n",
+        "32",
+        "-t",
+        "2",
+        "-b",
+        "64",
+        "-ub",
+        "64",
+        "-ngl",
+        "0",
+        "--device",
+        "none",
+        "--fit",
+        "off",
+        "--no-repack",
+        "--load-mode",
+        "none",
+        "--lazy-mode",
+        "off",
+        "-fa",
+        "off",
+        "-ctk",
+        "f16",
+        "-ctv",
+        "f16",
+        "-no-cnv",
+        "-p",
+        "Once upon a time",
+        "-lv",
+        "4",
+        "--no-display-prompt"
+      ],
+      "warnings": [
+        "Tensor payloads exclude backend buffer alignment, repacking, graph buffers and driver allocations.",
+        "Placement assumes single discrete GPU, standard CPU buffers, no repack/host/ACCEL overrides, and supported preferred-device kernels; fallback is not simulated.",
+        "Only separate Q/K/V dense full-attention tensors are supported; fused QKV, rope-factor tensors and adapters require separate support.",
+        "Stored tensor element count is reported; it is not certified trainable parameter count.",
+        "A parsed tensor directory does not certify payload contents, tokenizer validity or successful backend loading.",
+        "Allocated context after 256-token padding exceeds GGUF training context; supported extrapolation is not established.",
+        "kv_bytes describes requested-context payload; allocated_context and allocated_kv_bytes include the pinned single-sequence 256-token padding and drive the ledger. Buffer alignment remains separate."
+      ],
+      "passed": true
+    },
+    {
+      "model": "stories260K.gguf",
+      "model_sha256": "047bf46455a544931cff6fef14d7910154c56afbc23ab1c5e56a72e69912c04b",
+      "file_size": 1185376,
+      "context_requested": 512,
+      "context_allocated": 512,
+      "raw_kv_payload_bytes": 327680,
+      "allocated_kv_payload_bytes": 327680,
+      "tensor_payload_bytes": 1171200,
+      "backend_buffers": [
+        {
+          "device": "CPU",
+          "kind": "model",
+          "reported_value": 1.12,
+          "reported_unit": "MiB",
+          "rounded_bytes": 1174405.12,
+          "rounding_half_interval_bytes": 5242.88
+        },
+        {
+          "device": "CPU",
+          "kind": "output",
+          "reported_value": 0.0,
+          "reported_unit": "MiB",
+          "rounded_bytes": 0.0,
+          "rounding_half_interval_bytes": 5242.88
+        },
+        {
+          "device": "CPU",
+          "kind": "KV",
+          "reported_value": 0.31,
+          "reported_unit": "MiB",
+          "rounded_bytes": 325058.56,
+          "rounding_half_interval_bytes": 5242.88
+        },
+        {
+          "device": "CPU",
+          "kind": "compute",
+          "reported_value": 1.24,
+          "reported_unit": "MiB",
+          "rounded_bytes": 1300234.24,
+          "rounding_half_interval_bytes": 5242.88
+        }
+      ],
+      "component_comparisons": [
+        {
+          "component": "model",
+          "prediction_bytes": 1171200,
+          "difference_from_rounded_backend_bytes": 3205.1200000001118,
+          "within_reported_rounding_interval": true
+        },
+        {
+          "component": "KV",
+          "prediction_bytes": 327680,
+          "difference_from_rounded_backend_bytes": -2621.4400000000023,
+          "within_reported_rounding_interval": true
+        }
+      ],
+      "observed_process": {
+        "exit_code": 0,
+        "elapsed_seconds": 0.016538,
+        "os_peak_rss_bytes": 11714560,
+        "rss_sample_count": 0,
+        "sampled_peak_rss_bytes": null,
+        "last_sampled_rss_bytes": null,
+        "rss_sampling_error": "ps sampling unavailable (OS error 1); wait4 peak remains available",
+        "rss_note": "wait4 OS process high-water RSS; samples are not a separately identified steady-state phase"
+      },
+      "log": "stories260K-ctx512.log",
+      "command_template": [
+        "llama-completion",
+        "-m",
+        "stories260K.gguf",
+        "-c",
+        "512",
+        "-n",
+        "32",
+        "-t",
+        "2",
+        "-b",
+        "64",
+        "-ub",
+        "64",
+        "-ngl",
+        "0",
+        "--device",
+        "none",
+        "--fit",
+        "off",
+        "--no-repack",
+        "--load-mode",
+        "none",
+        "--lazy-mode",
+        "off",
+        "-fa",
+        "off",
+        "-ctk",
+        "f16",
+        "-ctv",
+        "f16",
+        "-no-cnv",
+        "-p",
+        "Once upon a time",
+        "-lv",
+        "4",
+        "--no-display-prompt"
+      ],
+      "warnings": [
+        "Tensor payloads exclude backend buffer alignment, repacking, graph buffers and driver allocations.",
+        "Placement assumes single discrete GPU, standard CPU buffers, no repack/host/ACCEL overrides, and supported preferred-device kernels; fallback is not simulated.",
+        "Only separate Q/K/V dense full-attention tensors are supported; fused QKV, rope-factor tensors and adapters require separate support.",
+        "Stored tensor element count is reported; it is not certified trainable parameter count.",
+        "A parsed tensor directory does not certify payload contents, tokenizer validity or successful backend loading.",
+        "Allocated context after 256-token padding exceeds GGUF training context; supported extrapolation is not established.",
+        "kv_bytes describes requested-context payload; allocated_context and allocated_kv_bytes include the pinned single-sequence 256-token padding and drive the ledger. Buffer alignment remains separate."
+      ],
+      "passed": true
+    },
+    {
+      "model": "stories15M-q4_0.gguf",
+      "model_sha256": "6151b1929d7f5aa3385d9ddef3393e55587c0a55de661562322bc51dfda93a04",
+      "file_size": 19077344,
+      "context_requested": 128,
+      "context_allocated": 256,
+      "raw_kv_payload_bytes": 884736,
+      "allocated_kv_payload_bytes": 1769472,
+      "tensor_payload_bytes": 18350208,
+      "backend_buffers": [
+        {
+          "device": "CPU",
+          "kind": "model",
+          "reported_value": 17.5,
+          "reported_unit": "MiB",
+          "rounded_bytes": 18350080.0,
+          "rounding_half_interval_bytes": 5242.88
+        },
+        {
+          "device": "CPU",
+          "kind": "output",
+          "reported_value": 0.12,
+          "reported_unit": "MiB",
+          "rounded_bytes": 125829.12,
+          "rounding_half_interval_bytes": 5242.88
+        },
+        {
+          "device": "CPU",
+          "kind": "KV",
+          "reported_value": 1.69,
+          "reported_unit": "MiB",
+          "rounded_bytes": 1772093.44,
+          "rounding_half_interval_bytes": 5242.88
+        },
+        {
+          "device": "CPU",
+          "kind": "compute",
+          "reported_value": 8.44,
+          "reported_unit": "MiB",
+          "rounded_bytes": 8849981.44,
+          "rounding_half_interval_bytes": 5242.88
+        }
+      ],
+      "component_comparisons": [
+        {
+          "component": "model",
+          "prediction_bytes": 18350208,
+          "difference_from_rounded_backend_bytes": -128.0,
+          "within_reported_rounding_interval": true
+        },
+        {
+          "component": "KV",
+          "prediction_bytes": 1769472,
+          "difference_from_rounded_backend_bytes": 2621.439999999944,
+          "within_reported_rounding_interval": true
+        }
+      ],
+      "observed_process": {
+        "exit_code": 0,
+        "elapsed_seconds": 0.054629,
+        "os_peak_rss_bytes": 35291136,
+        "rss_sample_count": 0,
+        "sampled_peak_rss_bytes": null,
+        "last_sampled_rss_bytes": null,
+        "rss_sampling_error": "ps sampling unavailable (OS error 1); wait4 peak remains available",
+        "rss_note": "wait4 OS process high-water RSS; samples are not a separately identified steady-state phase"
+      },
+      "log": "stories15M-q4_0-ctx128.log",
+      "command_template": [
+        "llama-completion",
+        "-m",
+        "stories15M-q4_0.gguf",
+        "-c",
+        "128",
+        "-n",
+        "32",
+        "-t",
+        "2",
+        "-b",
+        "64",
+        "-ub",
+        "64",
+        "-ngl",
+        "0",
+        "--device",
+        "none",
+        "--fit",
+        "off",
+        "--no-repack",
+        "--load-mode",
+        "none",
+        "--lazy-mode",
+        "off",
+        "-fa",
+        "off",
+        "-ctk",
+        "f16",
+        "-ctv",
+        "f16",
+        "-no-cnv",
+        "-p",
+        "Once upon a time",
+        "-lv",
+        "4",
+        "--no-display-prompt"
+      ],
+      "warnings": [
+        "Tensor payloads exclude backend buffer alignment, repacking, graph buffers and driver allocations.",
+        "Placement assumes single discrete GPU, standard CPU buffers, no repack/host/ACCEL overrides, and supported preferred-device kernels; fallback is not simulated.",
+        "Only separate Q/K/V dense full-attention tensors are supported; fused QKV, rope-factor tensors and adapters require separate support.",
+        "Stored tensor element count is reported; it is not certified trainable parameter count.",
+        "A parsed tensor directory does not certify payload contents, tokenizer validity or successful backend loading.",
+        "Allocated context after 256-token padding exceeds GGUF training context; supported extrapolation is not established.",
+        "kv_bytes describes requested-context payload; allocated_context and allocated_kv_bytes include the pinned single-sequence 256-token padding and drive the ledger. Buffer alignment remains separate."
+      ],
+      "passed": true
+    },
+    {
+      "model": "stories15M-q4_0.gguf",
+      "model_sha256": "6151b1929d7f5aa3385d9ddef3393e55587c0a55de661562322bc51dfda93a04",
+      "file_size": 19077344,
+      "context_requested": 512,
+      "context_allocated": 512,
+      "raw_kv_payload_bytes": 3538944,
+      "allocated_kv_payload_bytes": 3538944,
+      "tensor_payload_bytes": 18350208,
+      "backend_buffers": [
+        {
+          "device": "CPU",
+          "kind": "model",
+          "reported_value": 17.5,
+          "reported_unit": "MiB",
+          "rounded_bytes": 18350080.0,
+          "rounding_half_interval_bytes": 5242.88
+        },
+        {
+          "device": "CPU",
+          "kind": "output",
+          "reported_value": 0.12,
+          "reported_unit": "MiB",
+          "rounded_bytes": 125829.12,
+          "rounding_half_interval_bytes": 5242.88
+        },
+        {
+          "device": "CPU",
+          "kind": "KV",
+          "reported_value": 3.38,
+          "reported_unit": "MiB",
+          "rounded_bytes": 3544186.88,
+          "rounding_half_interval_bytes": 5242.88
+        },
+        {
+          "device": "CPU",
+          "kind": "compute",
+          "reported_value": 8.5,
+          "reported_unit": "MiB",
+          "rounded_bytes": 8912896.0,
+          "rounding_half_interval_bytes": 5242.88
+        }
+      ],
+      "component_comparisons": [
+        {
+          "component": "model",
+          "prediction_bytes": 18350208,
+          "difference_from_rounded_backend_bytes": -128.0,
+          "within_reported_rounding_interval": true
+        },
+        {
+          "component": "KV",
+          "prediction_bytes": 3538944,
+          "difference_from_rounded_backend_bytes": 5242.879999999888,
+          "within_reported_rounding_interval": true
+        }
+      ],
+      "observed_process": {
+        "exit_code": 0,
+        "elapsed_seconds": 0.060532,
+        "os_peak_rss_bytes": 36978688,
+        "rss_sample_count": 0,
+        "sampled_peak_rss_bytes": null,
+        "last_sampled_rss_bytes": null,
+        "rss_sampling_error": "ps sampling unavailable (OS error 1); wait4 peak remains available",
+        "rss_note": "wait4 OS process high-water RSS; samples are not a separately identified steady-state phase"
+      },
+      "log": "stories15M-q4_0-ctx512.log",
+      "command_template": [
+        "llama-completion",
+        "-m",
+        "stories15M-q4_0.gguf",
+        "-c",
+        "512",
+        "-n",
+        "32",
+        "-t",
+        "2",
+        "-b",
+        "64",
+        "-ub",
+        "64",
+        "-ngl",
+        "0",
+        "--device",
+        "none",
+        "--fit",
+        "off",
+        "--no-repack",
+        "--load-mode",
+        "none",
+        "--lazy-mode",
+        "off",
+        "-fa",
+        "off",
+        "-ctk",
+        "f16",
+        "-ctv",
+        "f16",
+        "-no-cnv",
+        "-p",
+        "Once upon a time",
+        "-lv",
+        "4",
+        "--no-display-prompt"
+      ],
+      "warnings": [
+        "Tensor payloads exclude backend buffer alignment, repacking, graph buffers and driver allocations.",
+        "Placement assumes single discrete GPU, standard CPU buffers, no repack/host/ACCEL overrides, and supported preferred-device kernels; fallback is not simulated.",
+        "Only separate Q/K/V dense full-attention tensors are supported; fused QKV, rope-factor tensors and adapters require separate support.",
+        "Stored tensor element count is reported; it is not certified trainable parameter count.",
+        "A parsed tensor directory does not certify payload contents, tokenizer validity or successful backend loading.",
+        "Allocated context after 256-token padding exceeds GGUF training context; supported extrapolation is not established.",
+        "kv_bytes describes requested-context payload; allocated_context and allocated_kv_bytes include the pinned single-sequence 256-token padding and drive the ledger. Buffer alignment remains separate."
+      ],
+      "passed": true
+    }
+  ]
+}

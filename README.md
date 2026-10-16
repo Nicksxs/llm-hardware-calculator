@@ -1,88 +1,67 @@
 # LLM Hardware Calculator
 
-A MoonBit native CLI for transparent memory budgets in local LLM inference.
+MoonBit-native GGUF inspection and tensor-level memory placement planning, with a lightweight parameter-only calculator as a fallback.
 
-**Status: early MVP, 8 October 2026.** The pure calculation core, native CLI, JSON reports and automated tests are implemented. The verified compiler is MoonBit v0.10.14. There are no hardware measurements or calibrated accuracy claims, and no versioned release has been published. Hackathon registration has not been submitted.
+**Status: engineering preview, 16 October 2026.** The artifact pipeline reads real GGUF directories, validates supported model structures, and plans actual tensor payload placement for a pinned llama.cpp policy. Two real models have been compared with the official GGUF reader and loaded on a CPU backend. Independent GPU hardware behavior has not been measured. No versioned release or hardware accuracy guarantee is claimed.
 
-## Quick start
+## Inspect a real model
 
-Install the matching [MoonBit toolchain](https://www.moonbitlang.com/download/); versions and checks are recorded in [toolchain](docs/toolchain.md).
+Install the matching [MoonBit toolchain](docs/toolchain.md), then run:
+
+```sh
+moon run src/cmd/llmcalc --target native -- inspect /path/to/model.gguf --json
+```
+
+Inspection returns metadata summaries, tensor names, dimensions, storage types, exact byte counts, offsets and I/O statistics. It reads the header and directory, not the multi-GB weight payload. Unknown tensor types remain visible with incomplete sizes; malformed counts, overflow, truncated or overlapping known spans are errors. Raw 64-bit integers are JSON decimal strings, preserving offsets above `2^53`.
+
+The reusable pure MoonBit `gguf` package accepts a bounded `ReaderAt`; the native file adapter uses a small POSIX C shim only for OS file access. See [format support, limits and API](docs/gguf.md).
+
+## Plan actual tensors
+
+```sh
+moon run src/cmd/llmcalc --target native -- plan /path/to/model.gguf \
+  --vram 16GiB --ram 64GiB --context 8K --json
+```
+
+The first supported profiles are dense, full-attention `llama` and `qwen2` with the documented tensor/shape subset. The planner derives architecture values from GGUF metadata and checks them against real tensor dimensions. It separately accounts for embeddings, output tensors, nonuniform transformer blocks and tied-output copies. It rejects incomplete sizes, unrecognized tensor roles and unsupported architecture features instead of falling back to an average layer size.
+
+The pinned backend revision is `88aaf325a7026ac1127d0897394b0a3d6413dc2a`. Its offload slots are **output-first**: `n_gpu_layers=1` offloads output only, then subsequent slots offload the last transformer blocks. Input embeddings remain on the CPU; the highest supported result is therefore called `MAX_OFFLOAD`, not full model residency on the GPU. Tied output on the GPU requires an additional embedding copy.
+
+Reports include every tensor placement, exact payload conservation, requested and allocated KV, separate GPU/RAM ledgers, steady and loading budgets, source revision and assumptions. Context allocation is padded to 256 tokens for this pinned single-sequence backend. Runtime buffers, device fallback, tensor alignment and startup copies retain explicit planning limitations. See [artifact planning](docs/artifact-planning.md).
+
+`--kv FP16` is the default. Q8_0/Q4_0 are separately disclosed capacity scenarios with alignment restrictions and unverified runtime compatibility. Memory and reserve flags accept GiB, decimal GB, or plain GiB numbers. Budget controls are `--gpu-runtime`, `--gpu-margin`, `--host-runtime`, `--os-reserve`, `--loading-workspace`, `--gpu-staging`; use `--help` for all options.
+
+## Evidence
+
+| Verification | Recorded result |
+| --- | --- |
+| MoonBit native tests, warnings denied | 95/95 passed |
+| Existing manual-calculator CLI verification | 42/42 cases, 44 real processes |
+| GGUF CLI verification | 28/28 cases, 39 real processes |
+| Real GGUF versus pinned official reader | 2 models, all 105 tensor descriptors matched |
+| Actual sparse-file inspection | 4,294,967,460 logical bytes; 109 bytes read; no tensor payload read |
+| CPU backend loading comparison | 4/4 runs; model and allocated KV predictions within the backend log rounding intervals |
+
+The sparse-file fixture allocated 4,096 disk bytes on the local filesystem. A separate virtual `ReaderAt` test covers offsets above `2^53`; this is not presented as a physical petabyte-file test. CPU peak process RSS is measured independently via `wait4` and is kept separate from backend buffer totals and OS planning reserves. Periodic `ps` sampling was unavailable in the local sandbox, so no steady-state RSS claim is made.
+
+[Validation results and boundaries](docs/validation.md) · [Recorded reader comparison](examples/validation/gguf-comparison.json) · [CPU runtime report](examples/validation/cpu-runtime.json) · [Reproduce the backend comparison](docs/backend-validation.md)
+
+These tests do not establish GPU accuracy, acceptable generation speed, model quality, all-backend compatibility or hackathon acceptance. Real-model runtime evidence currently covers the two listed Llama fixtures on CPU; Qwen2 profile support has synthetic tests. No model weights or upstream inference engine are embedded in this repository.
+
+## Manual estimate mode
+
+If you do not have a GGUF file, the original five-input calculator remains available:
 
 ```sh
 moon run src/cmd/llmcalc --target native -- \
-  --params 27B --quant Q4_K_M --vram 16GiB --ram 64GiB --context 8K
+  --params 27B --quant Q4_K_M --vram 16GiB --ram 64GiB --context 8K --json
 ```
 
-Append `--json` for a structured report or use `--help` for all options. This example uses a disclosed Qwen2.5-32B structural proxy: 64 layers, 8 KV heads, head dimension 128 and 40 query heads. Under the default planning policies it estimates **2 GiB FP16 KV** and **52 GPU / 12 CPU layers**. These are computed capacity scenarios, not hardware observations or backend launch instructions.
+This mode uses versioned BPW allowances and 7/14/32/72B structural proxies. It does not infer a model identity. Optional `--layers`, `--kv-heads`, `--head-dim` and `--query-heads` replace the proxy. Weight presets are FP16, BF16, Q8_0, Q6_K, Q5_K_M, Q4_K_M, IQ4_XS and IQ4_NL.
 
-Build a standalone native executable:
+Manual mode retains its uniform-layer approximation; its layer count is not the artifact planner's output-first `n_gpu_layers`. Its `FULL_GPU` result is a policy scenario. Do not substitute manual estimates for artifact-specific evidence. See [manual methodology](docs/methodology.md), [memory policy](docs/memory-policy.md) and the historical [27B computed example](examples/27b-comparison.md).
 
-```sh
-moon build --target native --release --deny-warn
-./_build/native/release/build/cmd/llmcalc/llmcalc.exe --help
-```
-
-The `.exe` filename is generated by MoonBit on macOS and Linux too.
-
-See the [27B comparison](examples/27b-comparison.md) for computed results across four weight recipes and four context capacities.
-
-## Inputs
-
-Basic requires five inputs:
-
-| Flag | Meaning and units |
-| --- | --- |
-| `--params 27B` | Decimal billions of parameters; a plain number also means billions. |
-| `--quant Q4_K_M` | FP16, BF16, Q8_0, Q6_K, Q5_K_M, Q4_K_M, IQ4_XS or IQ4_NL. |
-| `--vram 16GiB` | GPU budget; zero is valid for CPU-only evaluation. |
-| `--ram 64GiB` | Host memory budget before the displayed OS/runtime allowances. |
-| `--context 8K` | Allocated token capacity; K = 1,024. |
-
-Memory flags accept GiB, decimal GB, or a plain number interpreted as GiB. Internally, reports use bytes and binary GiB. Unknown, duplicate, missing and non-finite inputs are rejected. `Q4`, `Q5`, `Q6`, `Q8` aliases resolve to disclosed recipes; `IQ4` requires choosing XS or NL.
-
-Basic selects a sourced architecture proxy from the upper-size buckets 7/14/32/72B and defaults to FP16 KV. This does not identify your model. Inputs above 72B require Advanced structure values.
-
-Advanced replaces the proxy with all three of `--layers`, `--kv-heads` and `--head-dim`. `--query-heads` is optional and defaults to KV heads; supply the actual value for the MHA sensitivity scenario. Standard MHA/GQA requires query heads divisible by KV heads.
-
-```sh
-moon run src/cmd/llmcalc --target native -- \
-  --params 27B --quant Q4_K_M --vram 16GiB --ram 64GiB --context 8K \
-  --layers 64 --kv-heads 8 --head-dim 128 --query-heads 40 --kv Q8_0 --json
-```
-
-KV precision is independent of weight precision. Q8_0/Q4_0 KV require head dimensions divisible by 32; they are capacity scenarios and do not guarantee backend compatibility.
-
-Budget overrides accept the same memory units: `--gpu-runtime`, `--gpu-margin`, `--host-runtime`, `--os-reserve`, `--loading-workspace`, `--gpu-staging`. If RAM already excludes OS usage, adjust `--os-reserve` to avoid counting it twice. Defaults and loading-copy assumptions are documented in [memory policy](docs/memory-policy.md).
-
-## Reports and placement
-
-Reports retain inputs, canonical quantization, sourced structure, block baseline and planning weight estimates, KV payload, reserve policy, component ledgers and sensitivity scenarios. JSON schema version is `1`; numeric field names state their units. Text and JSON use the same calculation result.
-
-The calculator searches integer layer splits, starting with the most GPU-resident layers. GPU and RAM budgets remain separate. Both steady residency and modeled loading peaks must fit:
-
-| Result | Meaning under the reported policies |
-| --- | --- |
-| `FULL_GPU` | All layers fit on the GPU and the host loading budget fits RAM. |
-| `GPU+CPU OFFLOAD` | A partial uniform-layer split fits both independent budgets. |
-| `CPU ONLY` | A complete host-resident scenario fits RAM. |
-| `INSUFFICIENT` | No supported split satisfies these planning assumptions; JSON ledger is null. |
-
-Loading conservatively retains one full host weight copy, plus CPU KV and displayed reserves. Actual mmap residency, tensor placement, uneven layers and buffers can differ. Weight low/high and MHA structural sensitivities show changed assumptions; they are not confidence intervals. The project does not predict token throughput or model quality.
-
-Exit codes: `0` for a valid report (including INSUFFICIENT) or help, `2` for CLI input errors, `1` for calculation validation errors. Errors are written to stderr.
-
-## Method and scope
-
-- Weight baseline: parameter count multiplied by scale-inclusive GGML block costs.
-- Whole-model planning: a separately disclosed, uncalibrated BPW policy for mixed tensor types.
-- KV: tokens × layers × KV heads × head dimension × K/V factor × bytes per element.
-- Placement: a uniform-layer approximation with separate GPU/RAM steady and loading ledgers.
-
-The validated scope is one discrete GPU, dense decoder-only full-attention MHA/GQA, equal K/V head dimensions and one sequence. MoE, MLA, sliding/hybrid attention, multimodal state, recurrent models, shared/unified memory and multiple GPUs are outside this MVP. No GGUF model files are inspected.
-
-See [methodology](docs/methodology.md) and [pinned primary sources](docs/sources.md) for formulas, proxy revisions and limitations. JS, Wasm and a web interface remain future work.
-
-## Development and verification
+## Build and verify
 
 ```sh
 moon check --target native --deny-warn
@@ -90,18 +69,21 @@ moon test --target native --deny-warn
 moon fmt --check
 moon build --target native --release --deny-warn
 python3 scripts/verify_cli.py _build/native/release/build/cmd/llmcalc/llmcalc.exe
+python3 scripts/verify_gguf.py _build/native/release/build/cmd/llmcalc/llmcalc.exe
 ```
 
-There are no external Mooncakes dependencies. Formula fixtures, invalid-input tests, layer-boundary tests and a model/context integration matrix accompany the core. The Python verifier uses independent JSON parsing and real process checks. [Verification evidence](docs/validation.md) describes what was checked; [Native CI](https://github.com/Nicksxs/llm-hardware-calculator/actions/workflows/ci.yml) repeats these checks on Linux with a pinned toolchain. Its setup is documented in [CI](docs/ci.md).
+The generated `.exe` name is also used on macOS and Linux. The calculator has no external Mooncakes dependencies; native file access requires a POSIX platform with 64-bit offsets. Basic integration tests use only Python's standard library. Optional official-reader verification additionally needs the pinned Python dependencies listed in `scripts/validation-requirements.txt`.
 
-Package layout: `src/core` for pure arithmetic, `src/cli` for parsing and presentation, `src/cmd/llmcalc` for the native process entry point.
+[Native CI](https://github.com/Nicksxs/llm-hardware-calculator/actions/workflows/ci.yml) runs compilation, warnings-as-errors tests, formatting, release build and both CLI verifiers on Linux. [CI setup](docs/ci.md) pins toolchain archives and hashes. JS, Wasm, web UI, split GGUF, MoE, MLA, sliding/hybrid attention, multi-GPU and unified-memory planning remain outside this delivery.
+
+Package layout: `gguf` for pure binary parsing, `nativeio` for file access, `model` for checked tensor profiles and placement, `artifact_cli` for real-file commands, `core` and `cli` for manual estimation, and `cmd/llmcalc` for process entry.
 
 ## 中文简述
 
-项目已实现 MoonBit 计算核心、Native CLI、文本与 JSON 报告及自动测试。输入参数量、量化方式、显存、内存和上下文后，可检查权重、KV、预留和加载预算，评估完整 GPU、GPU+CPU、CPU ONLY、容量不足四种情景。结构代理和运行时预留均为公开假设，结果尚无硬件实测校准。
+项目现已实现“读取真实 GGUF → 校验并统计张量 → 提取模型结构 → 按固定后端规则规划卸载”的完整路径，保留原五项输入估算入口。MoonBit 承担二进制解析、整数范围校验、结构提取、张量分组与规划；C 仅桥接随机文件读取，Python 用于独立验收与测量。两个真实模型的目录对照和四次 CPU 加载已通过，GPU 硬件验证尚待补充。
 
-[中文规划参考](docs/project-proposal.md)是 AI 辅助草稿，不能用作正式申报书。报名表要求参赛者本人撰写一页以内的 Markdown 申报书，并要求仓库至少有 10 个有效提交。报名尚未提交。
+[早期中文规划记录](docs/project-proposal.md)为 AI 辅助技术参考，不是正式申报书。
 
 ## License
 
-[MIT](LICENSE). This independently implemented calculator references upstream formulas and configuration facts; it does not include an upstream inference engine or relicense model artifacts.
+[MIT](LICENSE). Referenced model artifacts and upstream tooling retain their own licenses; model weights are not redistributed here.
