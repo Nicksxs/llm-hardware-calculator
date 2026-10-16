@@ -67,3 +67,6 @@ jobs:
 
       - name: Verify CLI integration
         run: python3 scripts/verify_cli.py _build/native/release/build/cmd/llmcalc/llmcalc.exe
+
+      - name: Verify GGUF and large-file integration
+        run: python3 scripts/verify_gguf.py _build/native/release/build/cmd/llmcalc/llmcalc.exe

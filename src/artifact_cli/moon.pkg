@@ -1,0 +1,11 @@
+import {
+  "Nicksxs/llm-hardware-calculator/cli",
+  "Nicksxs/llm-hardware-calculator/core",
+  "Nicksxs/llm-hardware-calculator/gguf",
+  "Nicksxs/llm-hardware-calculator/model",
+  "Nicksxs/llm-hardware-calculator/nativeio",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+}
+
+supported_targets = "native"

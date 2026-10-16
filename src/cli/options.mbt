@@ -48,7 +48,7 @@ fn capacity(value : String, option : String) -> Result[Double, String] {
     None =>
       match upper.strip_suffix("GB") {
         Some(value) => (value, 1000000000.0 / 1073741824.0)
-        None => return Err(option + " requires GiB or GB (GB is decimal)")
+        None => (upper[:], 1.0)
       }
   }
   match number(numeric, option) {

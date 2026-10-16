@@ -1,6 +1,10 @@
 import {
   "Nicksxs/llm-hardware-calculator/core",
   "Nicksxs/llm-hardware-calculator/cli",
+  "Nicksxs/llm-hardware-calculator/artifact_cli",
+  "Nicksxs/llm-hardware-calculator/nativeio",
+  "Nicksxs/llm-hardware-calculator/gguf",
+  "Nicksxs/llm-hardware-calculator/model",
   "moonbitlang/core/env",
 }
 

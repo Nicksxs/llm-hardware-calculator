@@ -156,7 +156,7 @@ test "numeric bounds malformed units and unknown quantization fail" {
       ("--params", "1001"),
       ("--quant", "IQ4"),
       ("--quant", "Q3_K_M"),
-      ("--vram", "16"),
+      ("--vram", "16MB"),
       ("--vram", "-1GiB"),
       ("--ram", "NaNGiB"),
       ("--context", "0"),
@@ -331,4 +331,14 @@ test "JSON escapes architecture sources and text exposes assumptions" {
     ] {
     assert_true(text.contains(detail[:]))
   }
+}
+
+///|
+test "plain VRAM and RAM amounts use documented GiB units" {
+  let options = @cli.parse_args([
+    "--params", "7B", "--quant", "Q4_K_M", "--vram", "16", "--ram", "64", "--context",
+    "8K",
+  ]).unwrap()
+  assert_eq(options.input.vram_gib, 16.0)
+  assert_eq(options.input.ram_gib, 64.0)
 }
