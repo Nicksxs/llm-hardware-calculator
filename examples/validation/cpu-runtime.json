@@ -1,9 +1,10 @@
 {
   "schema_version": "1",
+  "created_at_utc": "2026-10-16T16:02:44.223057+00:00",
   "backend_revision": "88aaf325a7026ac1127d0897394b0a3d6413dc2a",
   "backend_version": "version: 0.7.0-dev (build 0, commit 88aaf325a7026ac1127d0897394b0a3d6413dc2a)\nbuilt with AppleClang 15.0.0.15000309 for Darwin arm64",
   "backend_binary_sha256": "c23cd8019f61ea1873af52712e1b4ba0984731dcd87430cff74167fa201bd30f",
-  "calculator_binary_sha256": "ea3a5a673e3670d4501aa014113d3ec452a05481acf8b6f5b5429d2473534256",
+  "calculator_binary_sha256": "da79957fa206379923a6e7bf9703ee8b281819a83ac914d0f3a9348985fee208",
   "platform": {
     "system": "Darwin",
     "release": "23.6.0",
@@ -72,8 +73,8 @@
       ],
       "observed_process": {
         "exit_code": 0,
-        "elapsed_seconds": 0.032643,
-        "os_peak_rss_bytes": 12025856,
+        "elapsed_seconds": 0.045493,
+        "os_peak_rss_bytes": 12533760,
         "rss_sample_count": 0,
         "sampled_peak_rss_bytes": null,
         "last_sampled_rss_bytes": null,
@@ -189,8 +190,8 @@
       ],
       "observed_process": {
         "exit_code": 0,
-        "elapsed_seconds": 0.016538,
-        "os_peak_rss_bytes": 11714560,
+        "elapsed_seconds": 0.016814,
+        "os_peak_rss_bytes": 11468800,
         "rss_sample_count": 0,
         "sampled_peak_rss_bytes": null,
         "last_sampled_rss_bytes": null,
@@ -306,8 +307,8 @@
       ],
       "observed_process": {
         "exit_code": 0,
-        "elapsed_seconds": 0.054629,
-        "os_peak_rss_bytes": 35291136,
+        "elapsed_seconds": 0.05434,
+        "os_peak_rss_bytes": 39354368,
         "rss_sample_count": 0,
         "sampled_peak_rss_bytes": null,
         "last_sampled_rss_bytes": null,
@@ -423,8 +424,8 @@
       ],
       "observed_process": {
         "exit_code": 0,
-        "elapsed_seconds": 0.060532,
-        "os_peak_rss_bytes": 36978688,
+        "elapsed_seconds": 0.055924,
+        "os_peak_rss_bytes": 41041920,
         "rss_sample_count": 0,
         "sampled_peak_rss_bytes": null,
         "last_sampled_rss_bytes": null,

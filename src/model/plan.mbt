@@ -284,6 +284,64 @@ pub fn plan(
 }
 
 ///|
+fn fits_budgets(candidate : Plan, vram : Double, ram : Double) -> Bool {
+  let ledger = candidate.ledger
+  ledger.gpu_steady_bytes <= vram &&
+  ledger.gpu_loading_peak_bytes <= vram &&
+  ledger.host_steady_bytes <= ram &&
+  ledger.host_loading_peak_bytes <= ram
+}
+
+///|
+/// Evaluate exactly one requested output/block placement. A failed budget
+/// check returns no plan and never searches for a smaller or larger request.
+pub fn evaluate_plan(
+  profile : Profile,
+  context : Int,
+  precision : @core.KvPrecision,
+  n_gpu_layers : Int,
+  vram_gib : Double,
+  ram_gib : Double,
+  policy : @core.BudgetPolicy,
+) -> Result[PlanSearch, String] {
+  if !(vram_gib >= 0.0 && vram_gib <= 1000000.0) ||
+    !(ram_gib >= 0.0 && ram_gib <= 1000000.0) {
+    return Err("GPU/RAM budgets must be finite and in [0, 1000000] GiB")
+  }
+  let candidate = match
+    plan(profile, context, precision, n_gpu_layers, policy) {
+    Ok(value) => value
+    Err(message) => return Err(message)
+  }
+  let request = "Fixed n_gpu_layers=\{n_gpu_layers} request"
+  if !fits_budgets(
+      candidate,
+      @core.gib_to_bytes(vram_gib),
+      @core.gib_to_bytes(ram_gib),
+    ) {
+    return Ok({
+      status: @core.Insufficient,
+      plan: None,
+      reason: request +
+      " does not fit the separate GPU/RAM steady/loading policy budgets; no alternative placement was searched. Runtime allowances remain uncalibrated.",
+    })
+  }
+  let status = if n_gpu_layers == profile.shape.layers + 1 {
+    @core.FullGPU
+  } else if n_gpu_layers == 0 {
+    @core.CPUOnly
+  } else {
+    @core.Offload
+  }
+  Ok({
+    status,
+    plan: Some(candidate),
+    reason: request +
+    " fits the separate GPU/RAM steady/loading policy budgets. Stored tensor payloads and explicit duplication are checked; runtime allowances remain uncalibrated.",
+  })
+}
+
+///|
 pub fn search_plan(
   profile : Profile,
   context : Int,
@@ -311,11 +369,7 @@ pub fn search_plan(
         Err(m) => return Err(m)
       }
     }
-    let ledger = candidate.ledger
-    if ledger.gpu_steady_bytes <= vram &&
-      ledger.gpu_loading_peak_bytes <= vram &&
-      ledger.host_steady_bytes <= ram &&
-      ledger.host_loading_peak_bytes <= ram {
+    if fits_budgets(candidate, vram, ram) {
       let status = if ngl == profile.shape.layers + 1 {
         @core.FullGPU
       } else if ngl == 0 {

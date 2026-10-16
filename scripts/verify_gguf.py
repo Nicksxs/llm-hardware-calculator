@@ -212,6 +212,7 @@ class Checks:
         args = ["plan", fixture["path"], "--vram=16GiB", "--ram=64GiB", "--context=1K"]
         report = self.report(args)
         require(report["fit"]["status"] == "MAX_OFFLOAD", "maximum offload must not be called FULL_GPU")
+        require(report["input"]["n_gpu_layers"] is None, "omitted offload request must remain an explicit search input")
         plan = report["fit"]["plan"]
         payload = sum(size for _, _, size, _ in fixture["records"])
         require(report["profile"]["tensor_payload_bytes"] == str(payload), "profile payload differs from independent stored tensor sizes")
@@ -306,6 +307,33 @@ def exercise(checks):
             require(report["fit"]["status"] == status, "zero-budget plan status mismatch")
             require((report["fit"]["plan"] is None) == (status == "INSUFFICIENT"), "insufficient plan must be null")
     checks.case("CPU-only and insufficient are valid plan results", cpu_and_insufficient)
+
+    def fixed_offload_case():
+        fixture = model_fixture(checks.path("fixed-offload"))
+        args = ["plan", fixture["path"], "--vram=16GiB", "--ram=64GiB", "--context=1K"]
+        for ngl, status in ((0, "CPU ONLY"), (1, "GPU+CPU OFFLOAD"), (2, "GPU+CPU OFFLOAD"), (3, "MAX_OFFLOAD")):
+            report = checks.report([*args, "--n-gpu-layers", str(ngl)])
+            require(report["input"]["n_gpu_layers"] == ngl, "JSON must retain explicit offload input")
+            require(report["fit"]["status"] == status, "fixed offload status mismatch")
+            require(report["fit"]["plan"]["n_gpu_layers"] == ngl, "fixed offload was silently replaced by search")
+            require(f"Fixed n_gpu_layers={ngl}" in report["fit"]["reason"], "reason must identify the fixed request")
+        failed = checks.report(["plan", fixture["path"], "--vram=0GiB", "--ram=64GiB", "--context=1K", "--n-gpu-layers=1"])
+        require(failed["input"]["n_gpu_layers"] == 1, "failed fixed request must remain in JSON input")
+        require(failed["fit"]["status"] == "INSUFFICIENT" and failed["fit"]["plan"] is None, "budget failure must not silently fall back to CPU-only")
+        require("Fixed n_gpu_layers=1" in failed["fit"]["reason"], "failed reason must identify the fixed request")
+        text = checks.run([*args, "--n-gpu-layers=0"])
+        require(text.returncode == 0 and not text.stderr and "fixed n_gpu_layers=0" in text.stdout, "text must expose fixed selection")
+        for extra in (["--n-gpu-layers"], ["--n-gpu-layers", "--json"], ["--n-gpu-layers=0", "--n-gpu-layers=1"]):
+            result = checks.run([*args, *extra, "--json"])
+            require(result.returncode == 2 and not result.stdout and result.stderr.startswith("llmcalc:"), "malformed offload option must exit 2")
+        for value in ("", "-1", "+1", "1.0", "1e0", "2147483648"):
+            result = checks.run([*args, "--n-gpu-layers=" + value, "--json"])
+            require(result.returncode == 2 and not result.stdout and result.stderr.startswith("llmcalc:"), "invalid decimal offload value must exit 2")
+        result = checks.run(["inspect", fixture["path"], "--n-gpu-layers=0", "--json"])
+        require(result.returncode == 2 and not result.stdout and result.stderr.startswith("llmcalc:"), "inspect must reject fixed offload")
+        result = checks.run([*args, "--n-gpu-layers=4", "--json"])
+        require(result.returncode == 1 and not result.stdout and "block_count+1" in result.stderr, "model-specific offload bound must fail at runtime")
+    checks.case("fixed offload preserves request, reports insufficiency and validates CLI exits", fixed_offload_case)
 
     def sparse_case():
         offset = (1 << 32) + 32

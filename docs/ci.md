@@ -29,6 +29,7 @@ moon fmt --check
 moon build --target native --release --deny-warn
 python3 scripts/verify_cli.py _build/native/release/build/cmd/llmcalc/llmcalc.exe
 python3 scripts/verify_gguf.py _build/native/release/build/cmd/llmcalc/llmcalc.exe
+python3 scripts/verify_gpu_tools.py
 ```
 
 Compilation and tests treat warnings as errors. Formatting is checked without changing sources. The integration script runs the release executable and checks CLI behavior and machine-readable output independently of package unit tests. Ubuntu's existing Python 3 runs the script; no Python packages are required.

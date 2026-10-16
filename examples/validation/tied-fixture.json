@@ -1,0 +1,27 @@
+{
+  "schema_version": "1",
+  "purpose": "derived tied-output structural validation fixture; not an official or trained tied model",
+  "source": {
+    "filename": "stories260K.gguf",
+    "sha256": "047bf46455a544931cff6fef14d7910154c56afbc23ab1c5e56a72e69912c04b",
+    "tensors": 48
+  },
+  "derivation": "official GGUFWriter copies retained tensors byte-for-byte, removes output.weight, and labels general.name/description",
+  "reference_revision": "88aaf325a7026ac1127d0897394b0a3d6413dc2a",
+  "reference_reader_sha256": {
+    "gguf_reader.py": "d0ea743200e19d7ef0a4c969edcc4a6dba8e3656a790b217e3bdc7b31170718e",
+    "constants.py": "3e6108928a33ac8d0c5c836d1854207f9137cd2b21825b7613c3705d29c5f183",
+    "quants.py": "2c927a1b3d9f0920dcf4007fb686e1b0999333e9f65ce43dcc689900c0beae8b",
+    "lazy.py": "dbc98e3ee9ef8606df34e9d91f98ab29c2697e6824995f1dd8952938c135ad85"
+  },
+  "reference_writer_sha256": "123158b033180f70f85638a0c654f6c2f269c7ada9238de37dd678e3e2627423",
+  "numpy_version": "2.3.5",
+  "derived": {
+    "filename": "stories260K-tied.gguf",
+    "sha256": "67af9dce730ec642b9648dfa18488597b049811292cbff7317f9fe8d6090f196",
+    "file_size": 1054464,
+    "tensors": 47,
+    "tensor_payload_bytes": 1040128
+  },
+  "all_retained_tensor_payloads_unchanged": true
+}

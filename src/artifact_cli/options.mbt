@@ -18,6 +18,7 @@ pub(all) struct PlanOptions {
   ram_gib : Double
   context : Int
   kv_precision : @core.KvPrecision
+  n_gpu_layers : Int?
   policy : @core.BudgetPolicy
   json : Bool
 } derive(Eq, Debug)
@@ -42,6 +43,22 @@ pub extend Command with Eq::{equal, not_equal}
 pub extend Command with @debug.Debug::{to_repr}
 
 ///|
+fn gpu_layers(value : String) -> Result[Int, String] {
+  let mut number = 0
+  for digit in value.iter() {
+    if digit < '0' || digit > '9' {
+      return Err("--n-gpu-layers requires a nonnegative decimal integer")
+    }
+    let digit = digit.to_int() - 48
+    if number > (2147483647 - digit) / 10 {
+      return Err("--n-gpu-layers exceeds the supported integer range")
+    }
+    number = number * 10 + digit
+  }
+  Ok(number)
+}
+
+///|
 /// Args include the subcommand and exclude the executable. Numeric memory/KV
 /// validation is shared with the Basic CLI; its parameter/quantization
 /// placeholders are discarded and never used for artifact computation.
@@ -58,6 +75,7 @@ pub fn parse_args(args : Array[String]) -> Result[Command, String] {
   let seen : Map[String, Bool] = Map([])
   let mut path : String? = None
   let mut json = false
+  let mut n_gpu_layers : Int? = None
   let mut help = false
   let mut index = 1
   while index < args.length() {
@@ -83,6 +101,7 @@ pub fn parse_args(args : Array[String]) -> Result[Command, String] {
       | "--ram"
       | "--context"
       | "--kv"
+      | "--n-gpu-layers"
       | "--gpu-runtime"
       | "--gpu-margin"
       | "--host-runtime"
@@ -114,7 +133,16 @@ pub fn parse_args(args : Array[String]) -> Result[Command, String] {
       if value.is_empty() {
         return Err("missing value for " + option)
       }
-      forwarded.push(option + "=" + value)
+      if option == "--n-gpu-layers" {
+        n_gpu_layers = Some(
+          match gpu_layers(value) {
+            Ok(number) => number
+            Err(message) => return Err(message)
+          },
+        )
+      } else {
+        forwarded.push(option + "=" + value)
+      }
     } else {
       if inline is Some(_) {
         return Err(option + " does not accept a value")
@@ -147,6 +175,7 @@ pub fn parse_args(args : Array[String]) -> Result[Command, String] {
         ram_gib: shared.input.ram_gib,
         context: shared.input.context,
         kv_precision: shared.kv_precision,
+        n_gpu_layers,
         policy: shared.policy,
         json,
       }),
@@ -165,5 +194,5 @@ pub fn parse_args(args : Array[String]) -> Result[Command, String] {
 
 ///|
 pub fn help_text() -> String {
-  "GGUF artifact commands\n\nUsage:\n  llmcalc inspect MODEL.gguf [--json]\n  llmcalc plan MODEL.gguf --vram 16GiB --ram 64GiB --context 8K [options]\n\ninspect reads GGUF metadata and tensor descriptors without loading tensor payloads.\nUnknown tensor types produce an incomplete inspection rather than a weight guess.\nplan requires complete supported tensor sizes and a supported model architecture.\n\nPlan options:\n  --vram NUMBERGiB --ram NUMBERGiB  Decimal GB also accepted\n  --context INTEGER[K]            K means 1024 tokens\n  --kv FP16|Q8_0|Q4_0              Default FP16; KV memory scenarios only\n  --gpu-runtime NUMBER            Default 0.5 GiB\n  --gpu-margin NUMBER             Default 1 GiB\n  --host-runtime NUMBER           Default 1 GiB\n  --os-reserve NUMBER             Default 4 GiB; 0 for already-free RAM\n  --loading-workspace NUMBER      Default 1 GiB\n  --gpu-staging NUMBER            Default 0.25 GiB\nPolicy numbers mean GiB unless GiB/GB is specified.\n\nCommon: --json, --help. Flags accept --flag=value; duplicates are errors.\nGGUF byte counts, offsets and element counts use decimal strings in JSON.\nGiB values are presentation conversions. Tensor payload size is not runtime memory."
+  "GGUF artifact commands\n\nUsage:\n  llmcalc inspect MODEL.gguf [--json]\n  llmcalc plan MODEL.gguf --vram 16GiB --ram 64GiB --context 8K [options]\n\ninspect reads GGUF metadata and tensor descriptors without loading tensor payloads.\nUnknown tensor types produce an incomplete inspection rather than a weight guess.\nplan requires complete supported tensor sizes and a supported model architecture.\n\nPlan options:\n  --vram NUMBERGiB --ram NUMBERGiB  Decimal GB also accepted\n  --context INTEGER[K]            K means 1024 tokens\n  --kv FP16|Q8_0|Q4_0              Default FP16; KV memory scenarios only\n  --n-gpu-layers INTEGER          Fix output/block offload slots: 0..block_count+1; no fallback\n  --gpu-runtime NUMBER            Default 0.5 GiB\n  --gpu-margin NUMBER             Default 1 GiB\n  --host-runtime NUMBER           Default 1 GiB\n  --os-reserve NUMBER             Default 4 GiB; 0 for already-free RAM\n  --loading-workspace NUMBER      Default 1 GiB\n  --gpu-staging NUMBER            Default 0.25 GiB\nPolicy numbers mean GiB unless GiB/GB is specified.\n\nCommon: --json, --help. Flags accept --flag=value; duplicates are errors.\nGGUF byte counts, offsets and element counts use decimal strings in JSON.\nGiB values are presentation conversions. Tensor payload size is not runtime memory."
 }

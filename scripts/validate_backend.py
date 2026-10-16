@@ -7,6 +7,7 @@ periodic ps samples are separately labeled and are not called steady-state RSS.
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import json
 import os
@@ -109,6 +110,18 @@ def main() -> int:
         parser.error("this RSS collector supports macOS and Linux only")
     if args.timeout < 1 or any(c < 1 or c > 1048576 for c in (args.context or [])):
         parser.error("positive timeout and contexts within 1..1048576 are required")
+    inputs = [args.calculator, args.backend, *args.model]
+    if args.manifest:
+        inputs.append(args.manifest)
+    destinations = [args.output] + [
+        args.output.parent / (model.stem + "-ctx" + str(context) + ".log")
+        for model in args.model for context in args.context or [128, 512]
+    ]
+    for destination in destinations:
+        for source in inputs:
+            if (destination.resolve() == source.resolve()
+                    or destination.exists() and source.exists() and destination.samefile(source)):
+                raise ValueError("validation output would overwrite an input: " + destination.name)
     version_run = subprocess.run([str(args.backend), "--version"], capture_output=True,
                                  text=True, check=True, timeout=15)
     version = (version_run.stdout + version_run.stderr).strip()
@@ -172,7 +185,8 @@ def main() -> int:
             }
             results.append(result)
     report = {
-        "schema_version": "1", "backend_revision": REVISION, "backend_version": version,
+        "schema_version": "1", "created_at_utc": datetime.now(timezone.utc).isoformat(),
+        "backend_revision": REVISION, "backend_version": version,
         "backend_binary_sha256": backend_hash, "calculator_binary_sha256": calculator_hash,
         "platform": {"system": platform.system(), "release": platform.release(), "machine": platform.machine()},
         "mode": "CPU only; GPU and offload hardware behavior were not measured",

@@ -2,7 +2,7 @@
 
 MoonBit-native GGUF inspection and tensor-level memory placement planning, with a lightweight parameter-only calculator as a fallback.
 
-**Status: engineering preview, 16 October 2026.** The artifact pipeline reads real GGUF directories, validates supported model structures, and plans actual tensor payload placement for a pinned llama.cpp policy. Two real models have been compared with the official GGUF reader and loaded on a CPU backend. Independent GPU hardware behavior has not been measured. No versioned release or hardware accuracy guarantee is claimed.
+**Status: engineering preview, 17 October 2026.** The artifact pipeline reads real GGUF directories, validates supported model structures, and plans actual tensor payload placement for a pinned llama.cpp policy. Two real models have been compared with the official GGUF reader and loaded on a CPU backend. Independent GPU hardware behavior has not been measured. No versioned release or hardware accuracy guarantee is claimed.
 
 ## Inspect a real model
 
@@ -27,6 +27,8 @@ The first supported profiles are dense, full-attention `llama` and `qwen2` with 
 
 The pinned backend revision is `88aaf325a7026ac1127d0897394b0a3d6413dc2a`. Its offload slots are **output-first**: `n_gpu_layers=1` offloads output only, then subsequent slots offload the last transformer blocks. Input embeddings remain on the CPU; the highest supported result is therefore called `MAX_OFFLOAD`, not full model residency on the GPU. Tied output on the GPU requires an additional embedding copy.
 
+By default, `plan` searches for the largest fitting placement. Add `--n-gpu-layers INTEGER` to evaluate exactly that request, from `0` through the file's `block_count + 1`. A fixed request that exceeds a GPU or RAM steady/loading budget returns `INSUFFICIENT` with a null plan; it does not fall back to another placement. JSON preserves the request in `input.n_gpu_layers`, or null when search was requested. `inspect` does not accept this flag.
+
 Reports include every tensor placement, exact payload conservation, requested and allocated KV, separate GPU/RAM ledgers, steady and loading budgets, source revision and assumptions. Context allocation is padded to 256 tokens for this pinned single-sequence backend. Runtime buffers, device fallback, tensor alignment and startup copies retain explicit planning limitations. See [artifact planning](docs/artifact-planning.md).
 
 `--kv FP16` is the default. Q8_0/Q4_0 are separately disclosed capacity scenarios with alignment restrictions and unverified runtime compatibility. Memory and reserve flags accept GiB, decimal GB, or plain GiB numbers. Budget controls are `--gpu-runtime`, `--gpu-margin`, `--host-runtime`, `--os-reserve`, `--loading-workspace`, `--gpu-staging`; use `--help` for all options.
@@ -35,9 +37,10 @@ Reports include every tensor placement, exact payload conservation, requested an
 
 | Verification | Recorded result |
 | --- | --- |
-| MoonBit native tests, warnings denied | 95/95 passed |
+| MoonBit native tests, warnings denied | 100/100 passed |
 | Existing manual-calculator CLI verification | 42/42 cases, 44 real processes |
-| GGUF CLI verification | 28/28 cases, 39 real processes |
+| GGUF CLI verification | 29/29 cases, 56 real processes |
+| Validation-tool guards and allocation/log checks, no GPU used | 25/25 passed |
 | Real GGUF versus pinned official reader | 2 models, all 105 tensor descriptors matched |
 | Actual sparse-file inspection | 4,294,967,460 logical bytes; 109 bytes read; no tensor payload read |
 | CPU backend loading comparison | 4/4 runs; model and allocated KV predictions within the backend log rounding intervals |
@@ -46,7 +49,11 @@ The sparse-file fixture allocated 4,096 disk bytes on the local filesystem. A se
 
 [Validation results and boundaries](docs/validation.md) · [Recorded reader comparison](examples/validation/gguf-comparison.json) · [CPU runtime report](examples/validation/cpu-runtime.json) · [Reproduce the backend comparison](docs/backend-validation.md)
 
+[CUDA collector preparation](docs/gpu-validation.md) documents the pending hardware checks, the independent allocation oracle and derived tied-output fixture. GPU inference has not yet been measured.
+
 These tests do not establish GPU accuracy, acceptable generation speed, model quality, all-backend compatibility or hackathon acceptance. Real-model runtime evidence currently covers the two listed Llama fixtures on CPU; Qwen2 profile support has synthetic tests. No model weights or upstream inference engine are embedded in this repository.
+
+The four CPU runs were refreshed against the current calculator binary identified in their timestamped report. Fixed-request behavior also has self-contained unit and CLI process tests; its GPU hardware execution remains unverified.
 
 ## Manual estimate mode
 
@@ -70,6 +77,7 @@ moon fmt --check
 moon build --target native --release --deny-warn
 python3 scripts/verify_cli.py _build/native/release/build/cmd/llmcalc/llmcalc.exe
 python3 scripts/verify_gguf.py _build/native/release/build/cmd/llmcalc/llmcalc.exe
+python3 scripts/verify_gpu_tools.py
 ```
 
 The generated `.exe` name is also used on macOS and Linux. The calculator has no external Mooncakes dependencies; native file access requires a POSIX platform with 64-bit offsets. Basic integration tests use only Python's standard library. Optional official-reader verification additionally needs the pinned Python dependencies listed in `scripts/validation-requirements.txt`.

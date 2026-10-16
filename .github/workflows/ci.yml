@@ -70,3 +70,6 @@ jobs:
 
       - name: Verify GGUF and large-file integration
         run: python3 scripts/verify_gguf.py _build/native/release/build/cmd/llmcalc/llmcalc.exe
+
+      - name: Verify validation-tool guards and allocation checks
+        run: python3 scripts/verify_gpu_tools.py

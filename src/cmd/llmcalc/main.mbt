@@ -50,15 +50,28 @@ fn artifact_main(args : Array[String]) -> Unit {
           return
         }
       }
-      let search = match
-        @model.search_plan(
-          profile,
-          options.context,
-          options.kv_precision,
-          options.vram_gib,
-          options.ram_gib,
-          options.policy,
-        ) {
+      let result = match options.n_gpu_layers {
+        Some(requested) =>
+          @model.evaluate_plan(
+            profile,
+            options.context,
+            options.kv_precision,
+            requested,
+            options.vram_gib,
+            options.ram_gib,
+            options.policy,
+          )
+        None =>
+          @model.search_plan(
+            profile,
+            options.context,
+            options.kv_precision,
+            options.vram_gib,
+            options.ram_gib,
+            options.policy,
+          )
+      }
+      let search = match result {
         Ok(search) => search
         Err(message) => {
           eprintln("llmcalc: " + message)

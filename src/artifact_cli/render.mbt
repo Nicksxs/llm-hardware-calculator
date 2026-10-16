@@ -308,6 +308,10 @@ pub fn render_plan_json(
     Some(plan) => plan_json(plan)
     None => Json::null()
   }
+  let requested_layers = match options.n_gpu_layers {
+    Some(value) => Json(value)
+    None => Json::null()
+  }
   let report : Json = {
     "schema_version": "1",
     "command": "plan",
@@ -317,6 +321,7 @@ pub fn render_plan_json(
       "ram_gib": Json(options.ram_gib),
       "context_tokens": Json(options.context),
       "kv_precision": Json(@core.kv_precision_name(options.kv_precision)),
+      "n_gpu_layers": requested_layers,
     },
     "artifact": artifact_json(scan),
     "profile": profile_json(profile),
@@ -368,6 +373,12 @@ pub fn render_plan_text(
     "Policy allowances (GiB): GPU runtime \{options.policy.gpu_runtime_gib}, margin \{options.policy.gpu_margin_gib}, staging \{options.policy.gpu_staging_gib}; host runtime \{options.policy.host_runtime_gib}, OS reserve \{options.policy.os_reserve_gib}, loading workspace \{options.policy.loading_workspace_gib}",
     "Backend revision: \{profile.backend_revision}",
   ]
+  lines.push(
+    match options.n_gpu_layers {
+      Some(value) => "Offload selection: fixed n_gpu_layers=\{value}"
+      None => "Offload selection: search for the largest fitting placement"
+    },
+  )
   for warning in scan.model.warnings {
     lines.push("Artifact warning: " + warning)
   }

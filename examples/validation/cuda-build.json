@@ -1,0 +1,80 @@
+{
+  "source_revision": "88aaf325a7026ac1127d0897394b0a3d6413dc2a",
+  "configure_flags": [
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DGGML_CUDA=ON",
+    "-DGGML_STATIC=OFF",
+    "-DGGML_CUDA_GRAPHS=OFF",
+    "-DCMAKE_CUDA_ARCHITECTURES=120a-real",
+    "-DCUDAToolkit_ROOT=<cuda-prefix>",
+    "-DCMAKE_CUDA_COMPILER=<cuda-prefix>/bin/nvcc",
+    "-DCUDA_cuda_driver_LIBRARY=/usr/lib/wsl/lib/libcuda.so",
+    "-DGGML_METAL=OFF",
+    "-DGGML_VULKAN=OFF",
+    "-DGGML_BLAS=OFF",
+    "-DGGML_OPENMP=OFF",
+    "-DGGML_ACCELERATE=OFF",
+    "-DLLAMA_OPENSSL=OFF",
+    "-DLLAMA_BUILD_TESTS=OFF",
+    "-DLLAMA_BUILD_SERVER=OFF",
+    "-DLLAMA_BUILD_APP=OFF",
+    "-DLLAMA_BUILD_EXAMPLES=OFF",
+    "-DLLAMA_BUILD_TOOLS=ON",
+    "-DLLAMA_BUILD_NUMBER=0",
+    "-DLLAMA_BUILD_COMMIT=88aaf325a7026ac1127d0897394b0a3d6413dc2a"
+  ],
+  "build_jobs": 2,
+  "user_cuda_layout": "lib64 symlink points to merged lib for nvcc profile linkage",
+  "configured": true,
+  "prepared_at_utc": "2026-10-16T16:09:05.813629+00:00",
+  "build_complete": true,
+  "gpu_inference_run": false,
+  "source_archive_sha256": "20c307e54cd299aab1b5dacd4fdd5d8ccd18c2120281836b97fd761b181730ad",
+  "platform": {
+    "system": "Linux",
+    "release": "6.18.54.1-microsoft-standard-WSL2",
+    "machine": "x86_64"
+  },
+  "executable": {
+    "filename": "llama-completion",
+    "sha256": "08d4fc3d41616f1687ad242171772c0d45e419d556b47175a473b98c9a9f271f",
+    "bytes": 15968
+  },
+  "libraries": [
+    {
+      "filename": "libggml-base.so.0.27.0",
+      "bytes": 897232,
+      "sha256": "6ef62d16ea551652470c873e2e2733d01e0e0737f70c3bbfd629d62be78fb997"
+    },
+    {
+      "filename": "libggml-cpu.so.0.27.0",
+      "bytes": 1424488,
+      "sha256": "6651c20e64d8175703225796918609f18d2c5b0c397706c3d5e67afb7732bf9c"
+    },
+    {
+      "filename": "libggml-cuda.so.0.27.0",
+      "bytes": 51340776,
+      "sha256": "682e0fc22008deb9bd4bb3f501cab2d6a2a6b996929820e6f60710dc207a153a"
+    },
+    {
+      "filename": "libggml.so.0.27.0",
+      "bytes": 55384,
+      "sha256": "4ce60dd28259bba3e29c0564fc1c4ad1a63e8effc1504d7735a76cfa697df42d"
+    },
+    {
+      "filename": "libllama-common.so.0.7.0",
+      "bytes": 6370656,
+      "sha256": "74e8068e468a8095e05b88c06a0f6e6a6eefa832f16aee1947cc97cbd7726a53"
+    },
+    {
+      "filename": "libllama-completion-impl.so",
+      "bytes": 144864,
+      "sha256": "bfa355d6520fbfedae99ccda78ef89138425407260308220d25d6d02a115516f"
+    },
+    {
+      "filename": "libllama.so.0.7.0",
+      "bytes": 5122032,
+      "sha256": "b201b140706a6982d2f040117307dc29b648e40db17be3144a9318c0077a3846"
+    }
+  ]
+}

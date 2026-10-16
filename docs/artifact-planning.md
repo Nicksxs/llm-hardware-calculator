@@ -8,6 +8,9 @@ moon run src/cmd/llmcalc --target native -- plan /path/to/model.gguf \
 
 moon run src/cmd/llmcalc --target native -- plan /path/to/model.gguf \
   --vram 0GiB --ram 64GiB --context 4K --kv FP16 --json
+
+moon run src/cmd/llmcalc --target native -- plan /path/to/model.gguf \
+  --vram 16GiB --ram 64GiB --context 8K --n-gpu-layers 2 --json
 ```
 
 Use an existing supported local model file. There are no `--params` or `--quant` overrides in this path. `inspect` remains available for other architectures or incomplete type inventories. The Basic five-input calculator remains a separate proxy-based path, documented in [methodology](methodology.md).
@@ -80,6 +83,10 @@ The first GPU block is `L + 1 - n`; the output is a separate slot at index `L`. 
 
 The artifact CLI reports `MAX_OFFLOAD` for all blocks plus output, since CPU embeddings still remain. `GPU+CPU OFFLOAD` includes output-only offload. `CPU ONLY` and `INSUFFICIENT` retain their capacity-policy meanings.
 
+The optional `--n-gpu-layers INTEGER` flag fixes this output/block slot count. It accepts nonnegative ASCII decimal integers, including zero, in either `--n-gpu-layers 2` or `--n-gpu-layers=2` form. Without the flag, the CLI searches for the largest fitting placement. With the flag, it evaluates exactly the requested `n`; a budget failure returns `INSUFFICIENT` and `fit.plan = null` without searching for another placement. JSON `input.n_gpu_layers` contains the requested integer even when it does not fit, or null when the flag was omitted. Text output identifies fixed selection versus search.
+
+Malformed, negative, overflowing, duplicate or missing values are CLI errors with exit code 2, and `inspect` rejects the flag. A decimal integer outside the file-specific `0..L+1` range is a model planning error with exit code 1. A valid fixed request that cannot satisfy the budgets remains a successful report with exit code 0 and `INSUFFICIENT` status.
+
 When `output.weight` is absent, the pinned backend creates its output from `token_embd.weight`. The [loader reclassifies this duplicate as an output operation](https://github.com/ggml-org/llama.cpp/blob/88aaf325a7026ac1127d0897394b0a3d6413dc2a/src/llama-model-loader.cpp#L1163), then [reuses it only within the same buffer context](https://github.com/ggml-org/llama.cpp/blob/88aaf325a7026ac1127d0897394b0a3d6413dc2a/src/llama-model-loader.cpp#L1371). Under this planner's standard CPU-buffer policy, CPU-only tied output reuses the embedding. GPU output requires a second embedding-sized GPU payload while preserving the CPU input copy:
 
 ```text
@@ -103,6 +110,16 @@ The ledger splits `allocated_kv_bytes` proportionally across the model's `L` rep
 
 The search visits `n = L + 1` down to zero and accepts the first placement whose GPU and RAM steady and modeled loading requirements fit independently. Output-only offload still incurs GPU runtime, margin and staging allowances even though it has zero GPU blocks. CPU-only planning incurs none of those GPU allowances.
 
+Library callers can choose between three entry points:
+
+| API | Behavior |
+| --- | --- |
+| `model.plan(profile, context, precision, n_gpu_layers, policy)` | Validates the profile and constructs one payload placement and ledger without accepting capacity budgets. |
+| `model.evaluate_plan(profile, context, precision, n_gpu_layers, vram_gib, ram_gib, policy)` | Evaluates exactly one requested placement against both GPU/RAM steady and loading budgets; returns `PlanSearch` with no plan when insufficient. |
+| `model.search_plan(profile, context, precision, vram_gib, ram_gib, policy)` | Searches descending output/block slot counts and returns the largest fitting placement. |
+
+The fixed evaluator and search use the same budget predicate. `evaluate_plan` does not clamp the requested count or call the search after a failure; its reason identifies the fixed request. Both capacity inputs and all existing profile/context/policy checks still apply.
+
 The [capacity policy](memory-policy.md) supplies runtime, margin, OS and workspace allowances. Host loading retains one full stored-payload source copy plus CPU KV, host runtime, OS reserve and workspace. It replaces steady host weights rather than adding an unexplained second source copy. Tied output's additional GPU allocation is accounted on the GPU side. Mmap residency and actual loading peaks can differ; the full-host-copy policy is an explicit conservative scenario, not an observed universal loader requirement.
 
 ## Nonuniform example and evidence boundary
@@ -118,4 +135,4 @@ The model tests include a synthetic two-block directory with 304-byte and 608-by
 
 With sufficient host memory, a 2,700-byte GPU budget admits the uniform projection but rejects the actual final block. The tensor-based search selects output-only offload. This is an arithmetic/placement regression fixture, not a measured language model or hardware benchmark.
 
-The `src/model` tests cover this distinction, output-first slot boundaries, the maximum-offload CPU embedding, tied-output duplication, independent host loading requirements, one-byte budget boundaries, 1/255/256/257-token padding boundaries, quantized KV and inconsistent public profiles. Measured backend evidence, hardware details and any observed errors are maintained separately in [validation](validation.md). Parser success, exact tensor bytes and a fitting plan do not establish GPU loading success, calibrated total-memory accuracy, throughput or model quality.
+The `src/model` tests cover this distinction, output-first slot boundaries, the maximum-offload CPU embedding, tied-output duplication, independent host loading requirements, one-byte budget boundaries, 1/255/256/257-token padding boundaries, quantized KV and inconsistent public profiles. Fixed-request tests additionally verify exact `n=0/1/2/L+1` results under ample budgets and rejection of a requested placement whose GPU steady, GPU loading or host loading budget is too small, without fallback. CLI process tests retain the request in JSON and distinguish usage errors from model bounds. Measured backend evidence, hardware details and any observed errors are maintained separately in [validation](validation.md). Parser success, exact tensor bytes and a fitting plan do not establish GPU loading success, calibrated total-memory accuracy, throughput or model quality. The newly added fixed-request path has not been exercised on GPU hardware.

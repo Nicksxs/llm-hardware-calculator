@@ -28,6 +28,7 @@ test "plan parses memory inputs and defaults without exposing proxy fields" {
   assert_eq(options.ram_gib, 64.0)
   assert_eq(options.context, 8192)
   assert_eq(options.kv_precision, @core.FP16KV)
+  assert_eq(options.n_gpu_layers, None)
   assert_eq(options.policy, @core.default_policy())
   assert_eq(options.json, false)
 }
@@ -133,4 +134,48 @@ test "plan requires all three capacity and context flags" {
     ] {
     assert_true(@artifact_cli.parse_args(args) is Err(_))
   }
+}
+
+///|
+test "plan retains explicit decimal n-gpu-layers including zero" {
+  for value in [0, 1, 2, 3, 2147483647] {
+    let args = plan_args()
+    args.push("--n-gpu-layers=" + value.to_string())
+    guard @artifact_cli.parse_args(args) is Ok(@artifact_cli.Plan(options)) else {
+      fail("expected explicit n-gpu-layers options")
+    }
+    assert_eq(options.n_gpu_layers, Some(value))
+  }
+  let args = plan_args()
+  args.append(["--n-gpu-layers", "0002"][:])
+  guard @artifact_cli.parse_args(args) is Ok(@artifact_cli.Plan(options)) else {
+    fail("expected separate decimal value")
+  }
+  assert_eq(options.n_gpu_layers, Some(2))
+}
+
+///|
+test "fixed offload rejects malformed missing duplicate and inspect flags" {
+  for
+    value in [
+      "", "-1", "+1", "1.0", "1e0", "0x1", " 1", "1 ", "１", "2147483648",
+    ] {
+    let args = plan_args()
+    args.push("--n-gpu-layers=" + value)
+    assert_true(@artifact_cli.parse_args(args) is Err(_))
+  }
+  for
+    extra in [
+      ["--n-gpu-layers"],
+      ["--n-gpu-layers", "--json"],
+      ["--n-gpu-layers=0", "--n-gpu-layers=1"],
+    ] {
+    let args = plan_args()
+    args.append(extra[:])
+    assert_true(@artifact_cli.parse_args(args) is Err(_))
+  }
+  assert_true(
+    @artifact_cli.parse_args(["inspect", "model.gguf", "--n-gpu-layers=0"])
+    is Err(_),
+  )
 }

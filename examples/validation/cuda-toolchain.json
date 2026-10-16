@@ -1,0 +1,44 @@
+{
+  "cuda_manifest": "https://developer.download.nvidia.com/compute/cuda/redist/redistrib_13.0.0.json",
+  "cuda_archives": [
+    {
+      "filename": "cuda_cccl-linux-x86_64-13.0.50-archive.tar.xz",
+      "sha256": "1aa6df471ee885f04aa3920d467395b5e5f665a53d206e74b10bb45abe92f3bc",
+      "bytes": 987548
+    },
+    {
+      "filename": "cuda_crt-linux-x86_64-13.0.48-archive.tar.xz",
+      "sha256": "ac444278c0f9d72b4a1b26c3bd9c694f07e1dbdc1e309aac9fd668378692e3e4",
+      "bytes": 79960
+    },
+    {
+      "filename": "cuda_cudart-linux-x86_64-13.0.48-archive.tar.xz",
+      "sha256": "30ffafae23833dafc965cf4e4d034f8553805586959328c64e2c47b3ef3bcd55",
+      "bytes": 1487372
+    },
+    {
+      "filename": "cuda_nvcc-linux-x86_64-13.0.48-archive.tar.xz",
+      "sha256": "cc5ff4a00d3be7c6c86ff740de7672e142ec87fea74e7e46b1b142b59fd2ac51",
+      "bytes": 26732376
+    },
+    {
+      "filename": "libnvvm-linux-x86_64-13.0.48-archive.tar.xz",
+      "sha256": "8c5676a65a2e6d13e3c229f025af18677de46c220d77992fe932200fa798b19b",
+      "bytes": 43941232
+    },
+    {
+      "filename": "libcublas-linux-x86_64-13.0.0.19-archive.tar.xz",
+      "sha256": "0abd3f4d4e8104e6cb8364ae0b264bc8b326db6af53e5c1aa0d288b55bc6f181",
+      "bytes": 797380780
+    }
+  ],
+  "cmake": {
+    "version": "4.1.3",
+    "official_metadata": "https://pypi.org/pypi/cmake/4.1.3/json",
+    "transport": "https://pypi.tuna.tsinghua.edu.cn/packages/e0/6c/323c40671c6f1b3e02bb4a7404fbe2bf653190a56e63cf4b6a4f06e876bc/cmake-4.1.3-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+    "sha256": "81f11b72bc59cbe547d9f283487ef0519bf68176edffcdfa1a4dc5a52f292369",
+    "bytes": 29690899
+  },
+  "scope": "isolated user workspace; no system packages or Linux NVIDIA driver installed",
+  "gpu_work_started": false
+}

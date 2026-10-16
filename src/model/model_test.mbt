@@ -355,6 +355,121 @@ test "nonuniform real layer costs change the plan versus uniform block allocatio
 }
 
 ///|
+test "fixed offload preserves every requested output and block count" {
+  let profile = @model.extract_profile(inventory_fixture("qwen2", false, true)).unwrap()
+  for
+    (ngl, status) in [
+      (0, @core.CPUOnly),
+      (1, @core.Offload),
+      (2, @core.Offload),
+      (3, @core.FullGPU),
+    ] {
+    let result = @model.evaluate_plan(
+      profile,
+      16,
+      @core.FP16KV,
+      ngl,
+      1.0,
+      1.0,
+      model_zero_policy(),
+    ).unwrap()
+    assert_eq(result.status, status)
+    assert_eq(result.plan.unwrap().n_gpu_layers, ngl)
+    assert_true(result.reason.contains("Fixed n_gpu_layers=" + ngl.to_string()))
+  }
+}
+
+///|
+test "fixed offload checks steady and loading budgets without fallback" {
+  let profile = @model.extract_profile(inventory_fixture("qwen2", false, true)).unwrap()
+  let policy = model_zero_policy()
+  let exact = @model.evaluate_plan(
+    profile,
+    16,
+    @core.FP16KV,
+    2,
+    @core.bytes_to_gib(2800.0),
+    @core.bytes_to_gib(3232.0),
+    policy,
+  ).unwrap()
+  assert_eq(exact.plan.unwrap().n_gpu_layers, 2)
+  for
+    (gpu_bytes, host_bytes, candidate_policy) in [
+      (2799.0, 6000.0, policy),
+      (2800.0, 3231.0, policy),
+      (2800.0, 6000.0, { ..policy, gpu_staging_gib: @core.bytes_to_gib(1.0), }),
+    ] {
+    let result = @model.evaluate_plan(
+      profile,
+      16,
+      @core.FP16KV,
+      2,
+      @core.bytes_to_gib(gpu_bytes),
+      @core.bytes_to_gib(host_bytes),
+      candidate_policy,
+    ).unwrap()
+    assert_eq(result.status, @core.Insufficient)
+    assert_eq(result.plan, None)
+    assert_true(result.reason.contains("Fixed n_gpu_layers=2"))
+    assert_true(result.reason.contains("no alternative placement was searched"))
+  }
+  let fallback = @model.search_plan(
+    profile,
+    16,
+    @core.FP16KV,
+    @core.bytes_to_gib(2799.0),
+    @core.bytes_to_gib(6000.0),
+    policy,
+  ).unwrap()
+  assert_eq(fallback.plan.unwrap().n_gpu_layers, 1)
+}
+
+///|
+test "fixed offload validates model bound and both capacity inputs" {
+  let profile = @model.extract_profile(inventory_fixture("qwen2", false, true)).unwrap()
+  for ngl in [-1, 4] {
+    assert_true(
+      @model.evaluate_plan(
+        profile,
+        16,
+        @core.FP16KV,
+        ngl,
+        1.0,
+        1.0,
+        model_zero_policy(),
+      )
+      is Err(_),
+    )
+  }
+  for invalid in [-1.0, 1000001.0, 0.0 / 0.0, 1.0 / 0.0] {
+    assert_true(
+      @model.evaluate_plan(
+        profile,
+        16,
+        @core.FP16KV,
+        0,
+        invalid,
+        1.0,
+        model_zero_policy(),
+      )
+      is Err(_),
+    )
+    assert_true(
+      @model.evaluate_plan(
+        profile,
+        16,
+        @core.FP16KV,
+        0,
+        1.0,
+        invalid,
+        model_zero_policy(),
+      )
+      is Err(_),
+    )
+  }
+}
+
+///|
 test "artifact planning checks exact capacity loading peaks and zero GPU" {
   let profile = @model.extract_profile(inventory_fixture("qwen2", false, true)).unwrap()
   let policy = model_zero_policy()
