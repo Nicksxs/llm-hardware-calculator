@@ -1,0 +1,2 @@
+# Preserve whitespace emitted by the reference backend in recorded GPU logs.
+examples/validation/gpu/*.log -whitespace

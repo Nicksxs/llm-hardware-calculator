@@ -1,0 +1,54 @@
+{
+  "schema_version": "1",
+  "checked_at_utc": "2026-10-17T00:29:20.040851+00:00",
+  "project_source_commit": "e27eafd576fb89bda6c0372c56a61c338d891437",
+  "reference_revision": "88aaf325a7026ac1127d0897394b0a3d6413dc2a",
+  "collector_sha256": "56a399a9c08f413c3f2b9e5cb1f8ac666be13b6e10030de0055a2b70f5e75e3e",
+  "calculator_sha256": "584cb817bbf2555c6f4038069f131b427a752c8df496034c8c2584ff099a0ee4",
+  "calculator_matches_run": true,
+  "build_artifacts": [
+    {
+      "filename": "llama-completion",
+      "sha256": "08d4fc3d41616f1687ad242171772c0d45e419d556b47175a473b98c9a9f271f",
+      "matches_prepared_build": true
+    },
+    {
+      "filename": "libggml-base.so.0.27.0",
+      "sha256": "6ef62d16ea551652470c873e2e2733d01e0e0737f70c3bbfd629d62be78fb997",
+      "matches_prepared_build": true
+    },
+    {
+      "filename": "libggml-cpu.so.0.27.0",
+      "sha256": "6651c20e64d8175703225796918609f18d2c5b0c397706c3d5e67afb7732bf9c",
+      "matches_prepared_build": true
+    },
+    {
+      "filename": "libggml-cuda.so.0.27.0",
+      "sha256": "682e0fc22008deb9bd4bb3f501cab2d6a2a6b996929820e6f60710dc207a153a",
+      "matches_prepared_build": true
+    },
+    {
+      "filename": "libggml.so.0.27.0",
+      "sha256": "4ce60dd28259bba3e29c0564fc1c4ad1a63e8effc1504d7735a76cfa697df42d",
+      "matches_prepared_build": true
+    },
+    {
+      "filename": "libllama-common.so.0.7.0",
+      "sha256": "74e8068e468a8095e05b88c06a0f6e6a6eefa832f16aee1947cc97cbd7726a53",
+      "matches_prepared_build": true
+    },
+    {
+      "filename": "libllama-completion-impl.so",
+      "sha256": "bfa355d6520fbfedae99ccda78ef89138425407260308220d25d6d02a115516f",
+      "matches_prepared_build": true
+    },
+    {
+      "filename": "libllama.so.0.7.0",
+      "sha256": "b201b140706a6982d2f040117307dc29b648e40db17be3144a9318c0077a3846",
+      "matches_prepared_build": true
+    }
+  ],
+  "all_build_artifacts_match_prepared": true,
+  "run_report_sha256": "59b4d552107646d99c52fa935388e5bc3e38e8d244c82f7f69d578df0aed7dbf",
+  "gpu_inference_completed": true
+}

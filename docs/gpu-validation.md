@@ -1,22 +1,28 @@
-# CUDA validation procedure
+# CUDA results and reproduction
 
-The GPU collector is prepared for hardware acceptance. **No CUDA inference results are recorded in this revision.** Local calculator checks and target WSL calculator tests do not establish that the CUDA backend or its memory predictions have passed hardware validation.
+The first hardware run on **17 October 2026 passed all 7/7 recorded cases** on WSL2 x86_64 with an NVIDIA GeForce RTX 5060 Ti, Windows driver **581.57** and CUDA **13.0** (NVCC **13.0.48**). The [runtime report](../examples/validation/gpu/gpu-runtime-run1.json) and its 14 stdout/stderr logs preserve inputs, binary/model hashes, per-layer device checks, allocation comparisons and telemetry. This validates the listed small-fixture cases within the stated measurement limits.
 
 ## Fixed scope
 
 `scripts/validate_gpu_backend.py` targets one CUDA GPU, the pinned llama.cpp revision `88aaf325a7026ac1127d0897394b0a3d6413dc2a`, plain CPU/CUDA buffers, full attention, one sequence and FP16 KV. It uses fixed `--n-gpu-layers`, independently reads the GGUF directory and verifies every tensor placement against the calculator.
 
-The five primary cases use the official `stories15M-q4_0.gguf` from the [model manifest](../examples/validation/model-manifest.json):
+The run used five cases from the official `stories15M-q4_0.gguf` in the [model manifest](../examples/validation/model-manifest.json), and two from the explicitly derived tied-output fixture. All exited successfully. Actual per-layer model/KV devices matched the independent oracle and calculator; model/KV byte expectations fell within the printed buffer intervals:
 
-| Requested context | `n_gpu_layers` | Intended check |
-| ---: | ---: | --- |
-| 256 | 0 | CPU model/KV baseline in the CUDA-enabled backend |
-| 256 | 1 | Output only on GPU; no GPU KV |
-| 256 | 2 | Output and final repeating block on GPU |
-| 256 | 7 | All six repeating blocks and output on GPU; input embedding remains CPU |
-| 257 | 7 | Backend allocates 512 context cells |
+| Fixture | Requested → allocated context | `n_gpu_layers` | GPU blocks | CUDA0 model / KV logs, MiB | Valid in-run samples |
+| --- | ---: | ---: | ---: | --- | ---: |
+| Official stories15M-q4_0 | 256 → 256 | 0 | 0 | absent / absent | 2 |
+| Official stories15M-q4_0 | 256 → 256 | 1 | 0 | 9.34 / absent | 2 |
+| Official stories15M-q4_0 | 256 → 256 | 2 | 1 | 9.88 / 0.28 | 3 |
+| Official stories15M-q4_0 | 256 → 256 | 7 | 6 | 12.56 / 1.69 | 2 |
+| Official stories15M-q4_0 | 257 → 512 | 7 | 6 | 12.56 / 3.38 | 3 |
+| Derived stories260K-tied | 256 → 256 | 1 | 0 | 0.13 / absent | 2 |
+| Derived stories260K-tied | 256 → 256 | 6 | 5 | 0.99 / 0.16 | 3 |
 
-An optional derived tied-output fixture adds context 256 with `n_gpu_layers=1` and `6` for its five repeating blocks. These cases check the additional GPU embedding copy. The collector checks the exact hashes of both inputs; an arbitrary five-layer model is not accepted as the derived fixture.
+An absent CUDA0 model or KV line is expected when that component has no CUDA allocation; it does not mean the process uses no GPU memory. In particular, `ngl=0` is a CPU weight/KV placement baseline, but its CUDA-enabled execution still logged **17.69 MiB CUDA0 compute**. It does not validate the calculator's CPU-only zero GPU allowance as a total-runtime budget.
+
+The context boundary case changed allocated cells from 256 to 512 and the GPU FP16 KV oracle from **1,769,472 to 3,538,944 bytes**, matching the **1.69 to 3.38 MiB** log intervals. The tied cases retained CPU input embeddings and added a **131,072-byte** GPU output copy in the oracle; model-buffer logs were consistent with the resulting totals. The collector checks exact hashes of both inputs; an arbitrary five-layer model is not accepted as the derived fixture.
+
+Each case evaluated five prompt tokens and reported 31 evaluation runs. Logs retain four warnings per case: two tokenizer-default fallbacks and two warnings that the allocated 256/512 context exceeds the fixture's 128-token training context. No generated-text quality or context-extrapolation quality was assessed.
 
 ## Derive the tied fixture
 
@@ -36,7 +42,7 @@ The fixture is not a trained tied-weight model. Loading it checks structure and 
 
 ## Build the reference CUDA backend
 
-The prepared WSL host has an RTX 5060 Ti and Windows driver 581.57. Development tools are isolated in a user workspace. CUDA 13.0.0 redistributables provide `cuda_cccl`, `cuda_crt`, `cuda_cudart`, `cuda_nvcc`, `libnvvm` and `libcublas`; archive hashes come from the [official fixed manifest](https://developer.download.nvidia.com/compute/cuda/redist/redistrib_13.0.0.json). CMake 4.1.3 is used. [Toolchain hashes](../examples/validation/cuda-toolchain.json) and the [completed build's configuration and binary/library hashes](../examples/validation/cuda-build.json) are recorded. Compilation succeeded; CUDA inference acceptance remains pending.
+The measured WSL2 host has an RTX 5060 Ti and Windows driver 581.57. Development tools are isolated in a user workspace. The CUDA 13.0.0 distribution manifest supplies NVCC/runtime **13.0.48**, alongside the recorded `cuda_cccl`, `cuda_crt`, `cuda_cudart`, `cuda_nvcc`, `libnvvm` and `libcublas` packages; archive hashes come from the [official fixed manifest](https://developer.download.nvidia.com/compute/cuda/redist/redistrib_13.0.0.json). CMake 4.1.3 is used. [Toolchain hashes](../examples/validation/cuda-toolchain.json) and the [completed build's configuration and binary/library hashes](../examples/validation/cuda-build.json) are recorded. Their preparation-time GPU-run fields describe the build stage; the later runtime report records the seven actual inference cases.
 
 For a manually merged SDK, the NVCC profile expects `lib64`; the prepared SDK uses `lib64 -> lib`. Keep the original WSL driver bridge at `/usr/lib/wsl/lib`. NVIDIA requires using the Windows-provided driver in WSL; installing a Linux NVIDIA driver would overwrite that bridge. See [NVIDIA's WSL guide](https://docs.nvidia.com/cuda/archive/13.0.0/wsl-user-guide/index.html).
 
@@ -82,10 +88,10 @@ Inference disables automatic fit, repacking, host-buffer preference, mmap, lazy 
 
 ## Interpret the results
 
-- **Raw tensor payload** remains the calculator's exact file accounting. CUDA buffers include additional allocation: each tensor gets 128-byte alignment and quantized tensors get one tail-row padding allowance to a 512-element boundary. Plain CPU tensors use 32-byte alignment. The independent oracle applies these rules before comparing with printed buffer rounding intervals.
+- **Raw tensor payload** remains the calculator's exact file accounting. The independent allocation oracle applies 128-byte CUDA tensor alignment and one quantized tail-row padding allowance to a 512-element boundary; plain CPU tensors use 32-byte alignment. The log comparison establishes consistency with two-decimal MiB rounding intervals, not byte-exact physical measurement of those rules. Some raw and padded totals fit the same interval in this run, so small padding differences are not independently resolved by the logs.
 - **KV** follows actual repeating-block devices and the padded context. The output slot has no KV. FP16 K/V tensors are accounted separately; compute/output buffers are retained as observations rather than silently treated as weights.
-- **Device telemetry** contains before/during/after `nvidia-smi` samples. Device totals include other processes, driver and CUDA context, and the sampled maximum is not the process's instantaneous VRAM peak.
+- **Device telemetry** contains before/during/after `nvidia-smi` samples. Every case had two or three valid in-run samples, with the backend alive at both ends of each query. Device totals include other processes, driver and CUDA context; their sampled maximum is not the process's instantaneous VRAM peak. `process_vram_peak_bytes` remains null in all seven cases.
 - **Unavailable telemetry** stays `null` with a reason. WSL/WDDM does not provide every NVML metric; see [NVIDIA's documented limitations](https://docs.nvidia.com/cuda/archive/13.0.0/wsl-user-guide/index.html#features-not-yet-supported). A run with no valid in-run device-memory sample does not pass the full collector.
-- **Provenance** includes binary/model hashes, exact command templates, platform and sanitized logs. GPU UUID is used internally to bind device selection and appears publicly only as a hash. Logs omit local user paths.
+- **Provenance** includes binary/model hashes, exact command templates, platform and sanitized logs. GPU UUID is used internally to bind device selection and appears publicly only as a hash. Logs omit local user paths. The [post-run provenance record](../examples/validation/gpu/gpu-provenance.json) verifies the collector hash and all eight prepared backend executable/library artifacts after the run.
 
-Passing these small-model checks would establish the recorded placement/allocation cases only. It would not calibrate default runtime reserves, GPU loading peaks, large-model capacity, Qwen2 execution, quantized KV, throughput or output quality.
+The seven passing cases establish the recorded per-layer model/KV placement and rounded component-buffer comparisons on this GPU. They do not calibrate default runtime reserves, validate a zero-total-GPU budget at `ngl=0`, measure process/GPU loading peaks, or establish large-model capacity, Qwen2 execution, quantized KV compatibility, throughput or output quality.

@@ -88,4 +88,4 @@ It compares only matching model and KV components against their reported roundin
 
 In the recorded sandbox `ps` was denied. OS `wait4` peak RSS remained available; unavailable sample fields and their reason were retained. No steady-state phase was identified. The result is **CPU loading evidence**, not a universal empirical accuracy bound. The tiny fixtures declare a short training context; allocation beyond it produces warnings and is not a text-quality evaluation.
 
-GPU/offload hardware, other inference revisions, device-kernel fallbacks, Qwen2 runtime loading and quantized-KV runtime combinations need their own future evidence. The project does not infer those outcomes from these CPU checks.
+Seven specific CUDA placement/allocation cases are recorded separately in [GPU validation](gpu-validation.md); they are not inferred from these CPU checks. Other inference revisions, general device-kernel fallbacks, Qwen2 runtime loading, quantized-KV runtime combinations and runtime-reserve calibration still need their own evidence.

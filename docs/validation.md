@@ -1,6 +1,6 @@
 # Verification evidence
 
-Calculator checks recorded on 16–17 October 2026 on macOS arm64 and target WSL2 x86_64, with MoonBit v0.10.14. The CPU runtime report was refreshed against the current calculator binary on macOS. Calculator checks and backend measurements remain separate evidence sets.
+Calculator checks recorded on 16–17 October 2026 on macOS arm64 and WSL2 x86_64, with MoonBit v0.10.14. The CPU and CUDA runtime reports preserve their respective calculator/backend hashes and capture times. Calculator checks and backend measurements remain separate evidence sets.
 
 ## Calculator checks
 
@@ -47,18 +47,27 @@ A CPU-only `llama-completion` was built from the same pinned source. Metal, CUDA
 
 Both models were actually loaded and evaluated at requested contexts **128 and 512**. The backend allocates **256 and 512** cells respectively. All four runs exited successfully. Exact predicted model payload and allocated KV fell within the rounding intervals of the backend's two-decimal MiB logs. [The runtime report](../examples/validation/cpu-runtime.json) retains the component comparisons and stderr logs.
 
-Those four runs were refreshed against the current calculator binary; the report records its hash and capture time. The fixed `--n-gpu-layers` entry point has unit/process tests, but no actual GPU inference measurement yet.
+Those four runs remain the CPU evidence for the calculator binary and capture time recorded in that report. The later CUDA measurements below are a separate evidence set.
 
 The OS independently recorded each child process's peak RSS using `wait4`. Periodic `ps` sampling was denied by the local sandbox; its fields remain unavailable, with the reason recorded. No sampled steady-state RSS is claimed. Process RSS includes executable code, allocator and compute buffers and is not equated to tensor payload or the calculator's host/OS budget reserves. Some allocated contexts exceed the tiny fixtures' training window; warnings are preserved, and generated-text quality is not assessed.
 
+## Actual CUDA run
+
+On **17 October 2026**, the first **7/7** cases passed on WSL2 x86_64, an NVIDIA GeForce RTX 5060 Ti, Windows driver **581.57** and CUDA **13.0** (NVCC **13.0.48**), using the pinned llama.cpp revision `88aaf325a7026ac1127d0897394b0a3d6413dc2a`. The [report](../examples/validation/gpu/gpu-runtime-run1.json) references 14 retained stdout/stderr logs; [build provenance](../examples/validation/cuda-build.json) records the backend binary, libraries and configuration.
+
+Five cases use the official `stories15M-q4_0.gguf`: context 256 at `ngl=0/1/2/7`, and context 257 at `ngl=7`. Two cases use the explicitly derived `stories260K-tied.gguf` at context 256 and `ngl=1/6`; it is an allocation fixture, not a trained tied-weight model. Actual per-layer CPU/CUDA0 model and KV assignments matched the independent inventory and fixed-request predictions. The full-offload 15M KV log increased from **1.69 MiB** at context 256 to **3.38 MiB** at requested context 257, which allocated 512 cells; the latter oracle is **3,538,944 bytes**. The tied cases retained CPU input embeddings and allocated an additional GPU output copy.
+
+Model/KV allocation comparisons passed within the logs' two-decimal MiB rounding intervals. This does not resolve padding byte-for-byte: some raw and padded totals fit the same printed interval. Each case evaluated five prompt tokens and reported 31 evaluation runs. Tokenizer-default and training-context warnings remain in the logs; generation quality was not assessed.
+
+Each case has two or three valid device-memory samples taken while the backend was alive. These are total-device `nvidia-smi` observations, including other processes and CUDA/driver state; `process_vram_peak_bytes` remains null. The `ngl=0` case placed model weights and KV on CPU but still logged a **17.69 MiB CUDA0 compute buffer**. It establishes a placement baseline in a CUDA-enabled backend, not fully CPU execution or a zero-total-GPU budget. [The CUDA results and procedure](gpu-validation.md) give the complete case table and reproduction steps.
+
 ## Evidence boundary
 
-- Actual loading evidence is **CPU-only, two Llama fixtures, FP16 KV**, one pinned backend and one local platform.
-- Single-GPU placements, preferred-device kernel behavior, GPU startup peaks and Qwen2 hardware loading remain unmeasured.
+- Recorded runtime evidence covers four CPU runs on two official Llama fixtures and seven CUDA cases on one official Llama fixture plus one explicitly derived tied-output fixture, all with FP16 KV and one pinned backend.
+- The CUDA run verifies its listed per-layer model/KV assignments and rounded component-buffer comparisons. Process VRAM peaks, GPU startup peaks and default runtime-reserve calibration remain unverified.
+- Large-model capacity, Qwen2 hardware loading and quantized KV compatibility remain unverified.
 - Raw payload agreement and rounded log agreement do not establish a universal memory-error percentage, successful loading of arbitrary models, throughput or model quality.
 - Inspection does not read tensor payload contents or verify their hashes. The external validation tools hash model artifacts separately.
 - JS, Wasm and a web frontend were not validated.
 
-[CUDA collector preparation](gpu-validation.md) documents the pending GPU cases and the derived tied-output fixture. No CUDA inference result is recorded.
-
-[Reproduction instructions](backend-validation.md) explain the optional reference-reader and backend checks. [Linux CI](https://github.com/Nicksxs/llm-hardware-calculator/actions/workflows/ci.yml) repeats self-contained unit and CLI checks; the recorded local backend runs are not presented as GPU or cross-platform runtime measurements.
+[Reproduction instructions](backend-validation.md) explain the optional reference-reader and CPU checks. [Linux CI](https://github.com/Nicksxs/llm-hardware-calculator/actions/workflows/ci.yml) repeats self-contained unit and CLI checks; the separately recorded CPU and CUDA runs do not establish compatibility across arbitrary platforms or GPUs.

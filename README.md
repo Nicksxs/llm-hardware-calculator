@@ -2,7 +2,7 @@
 
 MoonBit-native GGUF inspection and tensor-level memory placement planning, with a lightweight parameter-only calculator as a fallback.
 
-**Status: engineering preview, 17 October 2026.** The artifact pipeline reads real GGUF directories, validates supported model structures, and plans actual tensor payload placement for a pinned llama.cpp policy. Two real models have been compared with the official GGUF reader and loaded on a CPU backend. Independent GPU hardware behavior has not been measured. No versioned release or hardware accuracy guarantee is claimed.
+**Status: engineering preview, 17 October 2026.** The artifact pipeline reads real GGUF directories, validates supported model structures, and plans actual tensor payload placement for a pinned llama.cpp policy. Two real models have been compared with the official GGUF reader and loaded on a CPU backend. A first seven-case CUDA run on a WSL2 RTX 5060 Ti passed the recorded placement and rounded model/KV buffer checks, using five official-model cases and two derived tied-output cases. No versioned release or general hardware accuracy guarantee is claimed.
 
 ## Inspect a real model
 
@@ -44,16 +44,17 @@ Reports include every tensor placement, exact payload conservation, requested an
 | Real GGUF versus pinned official reader | 2 models, all 105 tensor descriptors matched |
 | Actual sparse-file inspection | 4,294,967,460 logical bytes; 109 bytes read; no tensor payload read |
 | CPU backend loading comparison | 4/4 runs; model and allocated KV predictions within the backend log rounding intervals |
+| CUDA backend comparison, WSL2 RTX 5060 Ti | 7/7 cases; per-layer model/KV placement matched and allocation oracle fell within printed buffer intervals |
 
 The sparse-file fixture allocated 4,096 disk bytes on the local filesystem. A separate virtual `ReaderAt` test covers offsets above `2^53`; this is not presented as a physical petabyte-file test. CPU peak process RSS is measured independently via `wait4` and is kept separate from backend buffer totals and OS planning reserves. Periodic `ps` sampling was unavailable in the local sandbox, so no steady-state RSS claim is made.
 
 [Validation results and boundaries](docs/validation.md) · [Recorded reader comparison](examples/validation/gguf-comparison.json) · [CPU runtime report](examples/validation/cpu-runtime.json) · [Reproduce the backend comparison](docs/backend-validation.md)
 
-[CUDA collector preparation](docs/gpu-validation.md) documents the pending hardware checks, the independent allocation oracle and derived tied-output fixture. GPU inference has not yet been measured.
+[CUDA results and reproduction](docs/gpu-validation.md) describe the 17 October run on driver 581.57 with CUDA 13.0 (NVCC 13.0.48): output-only, partial and maximum offload, context 257 allocated as 512, and retention of CPU input embeddings alongside a tied GPU output copy. The [CUDA report and its 14 logs](examples/validation/gpu/gpu-runtime-run1.json) record exact inputs and checks. Model/KV logs have two decimal MiB precision; agreement is limited to their rounding intervals. Each case has two or three valid in-run device-memory samples; process VRAM peak remains unavailable. The `ngl=0` weight/KV baseline still logged a 17.69 MiB CUDA0 compute buffer, so it does not validate a zero-total-GPU budget.
 
-These tests do not establish GPU accuracy, acceptable generation speed, model quality, all-backend compatibility or hackathon acceptance. Real-model runtime evidence currently covers the two listed Llama fixtures on CPU; Qwen2 profile support has synthetic tests. No model weights or upstream inference engine are embedded in this repository.
+These small-model measurements do not establish general GPU accuracy, large-model capacity, calibrated runtime reserves, acceptable generation speed, model quality, all-backend compatibility or hackathon acceptance. Qwen2 hardware loading and quantized KV compatibility remain unverified. No model weights or upstream inference engine are embedded in this repository.
 
-The four CPU runs were refreshed against the current calculator binary identified in their timestamped report. Fixed-request behavior also has self-contained unit and CLI process tests; its GPU hardware execution remains unverified.
+The four CPU runs remain a separate historical evidence set with their recorded calculator binary and capture time. The CUDA report identifies the calculator and backend binaries used for its seven cases. Tokenizer fallback and context-window warnings are retained; output quality is not assessed.
 
 ## Manual estimate mode
 
@@ -88,7 +89,7 @@ Package layout: `gguf` for pure binary parsing, `nativeio` for file access, `mod
 
 ## 中文简述
 
-项目现已实现“读取真实 GGUF → 校验并统计张量 → 提取模型结构 → 按固定后端规则规划卸载”的完整路径，保留原五项输入估算入口。MoonBit 承担二进制解析、整数范围校验、结构提取、张量分组与规划；C 仅桥接随机文件读取，Python 用于独立验收与测量。两个真实模型的目录对照和四次 CPU 加载已通过，GPU 硬件验证尚待补充。
+项目现已实现“读取真实 GGUF → 校验并统计张量 → 提取模型结构 → 按固定后端规则规划卸载”的完整路径，保留原五项输入估算入口。MoonBit 承担二进制解析、整数范围校验、结构提取、张量分组与规划；C 仅桥接随机文件读取，Python 用于独立验收与测量。两个真实模型的目录对照和四次 CPU 加载已有记录；WSL2 RTX 5060 Ti 上首轮七项 CUDA 后端实测通过，包括五项官方小模型和两项明确标注的衍生 tied fixture。结果限定于逐层放置和日志舍入区间内的模型/KV 分配对照，尚未校准运行时预留或验证大模型容量。
 
 [早期中文规划记录](docs/project-proposal.md)为 AI 辅助技术参考，不是正式申报书。
 

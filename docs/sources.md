@@ -9,7 +9,7 @@ The GGUF and tensor-planning packages use a newer fixed source snapshot than the
 - [Output-first device selection](https://github.com/ggml-org/llama.cpp/blob/88aaf325a7026ac1127d0897394b0a3d6413dc2a/src/llama-model.cpp) and [loader duplication](https://github.com/ggml-org/llama.cpp/blob/88aaf325a7026ac1127d0897394b0a3d6413dc2a/src/llama-model-loader.cpp).
 - [Single-sequence 256-token context padding](https://github.com/ggml-org/llama.cpp/blob/88aaf325a7026ac1127d0897394b0a3d6413dc2a/src/llama-context.cpp).
 
-See [GGUF inspection](gguf.md), [artifact planning](artifact-planning.md), the [model manifest](../examples/validation/model-manifest.json) and [current validation evidence](validation.md). The older sections below remain provenance for manual BPW/proxy mode; their earlier no-hardware-measurement status is historical, superseded for the specific CPU cases documented in the current evidence.
+See [GGUF inspection](gguf.md), [artifact planning](artifact-planning.md), the [model manifest](../examples/validation/model-manifest.json) and [current validation evidence](validation.md). The older sections below remain provenance for manual BPW/proxy mode; their earlier no-hardware-measurement status is historical, superseded for the specific CPU and CUDA cases documented in the current evidence.
 
 Checked on 8 October 2026. These links pin the source revision used to check the calculator's formulas and presets. The calculator implements its own MoonBit arithmetic; it does not embed upstream inference or quantization code.
 
