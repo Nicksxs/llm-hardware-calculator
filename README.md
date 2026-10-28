@@ -91,7 +91,7 @@ Package layout: `gguf` for pure binary parsing, `nativeio` for file access, `mod
 
 项目现已实现“读取真实 GGUF → 校验并统计张量 → 提取模型结构 → 按固定后端规则规划卸载”的完整路径，保留原五项输入估算入口。MoonBit 承担二进制解析、整数范围校验、结构提取、张量分组与规划；C 仅桥接随机文件读取，Python 用于独立验收与测量。两个真实模型的目录对照和四次 CPU 加载已有记录；WSL2 RTX 5060 Ti 上首轮七项 CUDA 后端实测通过，包括五项官方小模型和两项明确标注的衍生 tied fixture。结果限定于逐层放置和日志舍入区间内的模型/KV 分配对照，尚未校准运行时预留或验证大模型容量。
 
-[早期中文规划记录](docs/project-proposal.md)为 AI 辅助技术参考，不是正式申报书。
+[早期设计记录](docs/project-proposal.md)仅供参考，当前功能与验证结果以本文及相关文档为准。
 
 ## License
 
