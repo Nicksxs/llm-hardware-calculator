@@ -46,4 +46,6 @@ These links cite configuration facts. The project's MIT license does not relicen
 
 Upstream sources establish tensor shapes and block costs. They do not establish the calculator's `planning-policy-v1` BPW allowances, `capacity-policy-v1` reserves, equal-layer placement approximation or full-host-copy loading policy. Those are explicitly uncalibrated project choices documented in [methodology](methodology.md) and [memory policy](memory-policy.md).
 
-Native MoonBit tests check arithmetic and policy behavior. No hardware measurements, empirical accuracy figure, performance benchmark or backend compatibility certification has been produced. Consult [toolchain](toolchain.md) for the verified environment; JS and Wasm execution are outside the current verification evidence.
+Historical status on 8 October 2026: native MoonBit tests checked arithmetic and policy behavior, and no hardware measurements had yet been produced. The specific CPU and CUDA measurements recorded on 16–17 October supersede that earlier status; see [current validation evidence](validation.md). They do not establish general empirical accuracy, large-model performance or backend compatibility certification. Consult [toolchain](toolchain.md) for the verified environment; JS and Wasm execution remain outside the current verification evidence.
+
+For the current feature boundaries and component-level comparison with Accelerate, GGUFReader and llama.cpp, see [功能边界与成熟工具对比](capabilities-and-comparison.zh.md).

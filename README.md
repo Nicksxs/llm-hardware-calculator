@@ -4,6 +4,12 @@ MoonBit-native GGUF inspection and tensor-level memory placement planning, with 
 
 **Status: engineering preview, 17 October 2026.** The artifact pipeline reads real GGUF directories, validates supported model structures, and plans actual tensor payload placement for a pinned llama.cpp policy. Two real models have been compared with the official GGUF reader and loaded on a CPU backend. A first seven-case CUDA run on a WSL2 RTX 5060 Ti passed the recorded placement and rounded model/KV buffer checks, using five official-model cases and two derived tied-output cases. No versioned release or general hardware accuracy guarantee is claimed.
 
+## 功能与证据导览
+
+当前主路径已经实现真实 GGUF 目录解析、逐张量 payload 核算和固定后端的**单 GPU + CPU** 放置规划；参数量公式保留为独立粗估入口。多 GPU、MoE 和真实大模型性能基准尚未完成，现有小模型 CUDA 记录验证的是放置及组件分配。
+
+[中文功能边界、源码与验证证据、成熟工具对比](docs/capabilities-and-comparison.zh.md) 集中列出已实现、部分验证与未支持的内容，并对照 Accelerate estimate-memory、官方 Python GGUFReader、C++ llama.cpp loader / llama-bench。本次 2026-10-30 文档整理不新增测量或功能。
+
 ## Inspect a real model
 
 Install the matching [MoonBit toolchain](docs/toolchain.md), then run:
